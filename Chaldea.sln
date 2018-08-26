@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{863C17D6-06EA-4B30-8549-4F571FBF93BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{230C5673-DEA7-4E80-82C3-E79FD7CE1BE2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.ApiGateway", "src\Chaldea.ApiGateway\Chaldea.ApiGateway.csproj", "{5DEACFCC-38DA-444E-98C3-9C139175997A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea", "src\Chaldea\Chaldea.csproj", "{665D2F5D-B818-4866-817B-641F76F52939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaldea.Resource.Manager", "tools\Chaldea.Resource.Manager\Chaldea.Resource.Manager.csproj", "{A7C187FB-1711-43B9-B314-E6021A26503A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5DEACFCC-38DA-444E-98C3-9C139175997A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DEACFCC-38DA-444E-98C3-9C139175997A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DEACFCC-38DA-444E-98C3-9C139175997A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DEACFCC-38DA-444E-98C3-9C139175997A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{665D2F5D-B818-4866-817B-641F76F52939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{665D2F5D-B818-4866-817B-641F76F52939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{665D2F5D-B818-4866-817B-641F76F52939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{665D2F5D-B818-4866-817B-641F76F52939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7C187FB-1711-43B9-B314-E6021A26503A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7C187FB-1711-43B9-B314-E6021A26503A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7C187FB-1711-43B9-B314-E6021A26503A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7C187FB-1711-43B9-B314-E6021A26503A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5DEACFCC-38DA-444E-98C3-9C139175997A} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
+		{665D2F5D-B818-4866-817B-641F76F52939} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
+		{A7C187FB-1711-43B9-B314-E6021A26503A} = {230C5673-DEA7-4E80-82C3-E79FD7CE1BE2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8FB94BA5-79C6-45F9-9972-8118990A9522}
+	EndGlobalSection
+EndGlobal
