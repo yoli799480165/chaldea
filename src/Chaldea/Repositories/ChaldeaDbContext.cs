@@ -8,7 +8,7 @@ namespace Chaldea.Repositories
     {
         private readonly IMongoDatabase _database;
 
-        public ChaldeaDbContext(IOptions<MongoDBSettings> settings)
+        public ChaldeaDbContext(IOptions<MongoDbSettings> settings)
         {
             var client = new MongoClient(settings.Value.ConnectionString);
             _database = client.GetDatabase(settings.Value.Database);

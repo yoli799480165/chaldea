@@ -40,7 +40,7 @@ namespace Chaldea
                 .AddApiExplorer();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
 
-            services.Configure<MongoDBSettings>(Configuration.GetSection("MongoDB"));
+            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDB"));
             services.AddTransient<ChaldeaDbContext>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
         }
