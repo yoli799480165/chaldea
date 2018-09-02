@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.ApiGateway", "src\C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea", "src\Chaldea\Chaldea.csproj", "{665D2F5D-B818-4866-817B-641F76F52939}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.FileManager", "src\Chaldea.FileManager\Chaldea.FileManager.csproj", "{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{665D2F5D-B818-4866-817B-641F76F52939}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{665D2F5D-B818-4866-817B-641F76F52939}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{665D2F5D-B818-4866-817B-641F76F52939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5DEACFCC-38DA-444E-98C3-9C139175997A} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 		{665D2F5D-B818-4866-817B-641F76F52939} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
+		{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8FB94BA5-79C6-45F9-9972-8118990A9522}

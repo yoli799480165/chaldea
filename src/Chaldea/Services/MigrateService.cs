@@ -86,6 +86,14 @@ namespace Chaldea.Services
                 Console.WriteLine("数据还原结束.");
             }
         }
+
+//        [Route("api/migrateTags")]
+//        [HttpGet]
+//        public async Task MigrateTags()
+//        {
+//            var list = new List<Tag>();
+//            list.Add(new Tag { Name = });
+//        }
     }
 
     public class Data

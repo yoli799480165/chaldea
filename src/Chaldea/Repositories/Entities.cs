@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Chaldea.Services;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace Chaldea.Repositories
 {
@@ -26,6 +28,12 @@ namespace Chaldea.Repositories
 
         public string Desc { get; set; }
 
+        public string State { get; set; }
+
+        public string Type { get; set; }
+
+        public List<string> Tags { get; set; }
+
         public List<Resource> Animes { get; set; }
 
         public List<Resource> Comics { get; set; }
@@ -34,18 +42,18 @@ namespace Chaldea.Repositories
 
         public List<Comment> Comments { get; set; }
 
-        [BsonId] public ObjectId Id { get; set; }
+        [BsonId]
+        [JsonConverter(typeof(ObjectIdConverter))]
+        public ObjectId Id { get; set; }
     }
 
-    public class Resource : IEntity<ObjectId>
+    public class Resource
     {
         public string Uid { get; set; }
 
         public string Name { get; set; }
 
         public string Url { get; set; }
-
-        [BsonId] public ObjectId Id { get; set; }
     }
 
     public class Comment : IEntity<ObjectId>

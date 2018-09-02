@@ -21,6 +21,12 @@ namespace Chaldea.Services
         [HttpGet]
         public async Task<ICollection<Bangumi>> GetList(int skip, int take)
         {
+            if (skip == 0 && take == 0)
+                return await _bangumiRepository
+                    .GetAll()
+                    .SortByDescending(x => x.Name)
+                    .ToListAsync();
+
             var query = Builders<Bangumi>.Projection.Slice(x => x.Animes, 0, 6);
             var list = await _bangumiRepository
                 .GetAll()
