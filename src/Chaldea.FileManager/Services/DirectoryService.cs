@@ -43,6 +43,16 @@ namespace Chaldea.FileManager.Services
             return Ok();
         }
 
+        [Route("renameDirectory")]
+        [HttpPost]
+        public IActionResult RenameDirectory([FromBody] RenameDirectoryDto input)
+        {
+            if (!Directory.Exists(input.SourcePath)) throw new Exception("Source dir not exists.");
+            if (Directory.Exists(input.DestPath)) throw new Exception("Dest dir exists.");
+            Directory.Move(input.SourcePath, input.DestPath);
+            return Ok();
+        }
+
         [Route("searchFiles")]
         [HttpPost]
         public async Task<ICollection<FileDto>> SearchFiles([FromBody] SearchFilesDto input)
@@ -92,6 +102,13 @@ namespace Chaldea.FileManager.Services
 //
 //        public string AnimeName { get; set; }
 //    }
+
+    public class RenameDirectoryDto
+    {
+        public string SourcePath { get; set; }
+
+        public string DestPath { get; set; }
+    }
 
     public class RenameFilesDto
     {

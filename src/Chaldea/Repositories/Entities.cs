@@ -19,6 +19,7 @@ namespace Chaldea.Repositories
 
         public string Cover { get; set; }
 
+        [JsonConverter(typeof(ObjectIdConverter))]
         [BsonId] public ObjectId Id { get; set; }
     }
 

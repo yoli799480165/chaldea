@@ -37,6 +37,17 @@ namespace Chaldea.Services
             return bangumi.Animes;
         }
 
+        [Route("{bangumiId}/update")]
+        [HttpPost]
+        public async Task Update(string bangumiId, [FromBody] Anime input)
+        {
+            var filter = Builders<Bangumi>.Filter.Eq("_id", RepositoryHelper.GetInternalId(bangumiId)) &
+                         Builders<Bangumi>.Filter.Eq("animes._id", input.Id);
+            var update = Builders<Bangumi>.Update.Set("animes.$", input);
+
+            await _bangumiRepository.UpdateAsync(filter, update);
+        }
+
         [Route("getdetail")]
         [HttpGet]
         public async Task<AnimeDetail> GetDetail(string animeId)
