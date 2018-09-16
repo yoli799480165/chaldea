@@ -36,6 +36,8 @@ namespace Chaldea.Repositories
 
         Task<List<TEntity>> GetAllListAsync(ProjectionDefinition<TEntity> filter);
 
+        Task<List<TEntity>> GetAllListAsync(FilterDefinition<TEntity> filter);
+
         Task<List<TEntity>> GetAllListAsync(Expression<Func<TEntity, bool>> predicate,
             CancellationToken cancellationToken = default(CancellationToken));
 

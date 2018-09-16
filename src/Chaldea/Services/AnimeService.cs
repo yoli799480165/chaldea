@@ -39,10 +39,9 @@ namespace Chaldea.Services
         [HttpPost]
         public async Task Update(string bangumiId, [FromBody] Anime input)
         {
-            var filter = Builders<Bangumi>.Filter.Eq("_id", bangumiId) &
-                         Builders<Bangumi>.Filter.Eq("animes._id", input.Id);
+            var filter = Builders<Bangumi>.Filter.Eq("_id", RepositoryHelper.GetInternalId(bangumiId)) &
+                         Builders<Bangumi>.Filter.Eq("animes._id", RepositoryHelper.GetInternalId(input.Id));
             var update = Builders<Bangumi>.Update.Set("animes.$", input);
-
             await _bangumiRepository.UpdateAsync(filter, update);
         }
 

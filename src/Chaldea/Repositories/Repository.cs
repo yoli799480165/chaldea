@@ -64,6 +64,11 @@ namespace Chaldea.Repositories
             return await _db.Find(_ => true).Project<TEntity>(filter).ToListAsync();
         }
 
+        public async Task<List<TEntity>> GetAllListAsync(FilterDefinition<TEntity> filter)
+        {
+            return await _db.Find(filter).ToListAsync();
+        }
+
         public async Task<List<TEntity>> GetAllListAsync(Expression<Func<TEntity, bool>> predicate,
             CancellationToken cancellationToken = default(CancellationToken))
         {
