@@ -20,6 +20,10 @@ namespace Chaldea.Repositories
 
         public string Cover { get; set; }
 
+        public long PlayCounts { get; set; }
+
+        public long SubCounts { get; set; }
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -30,6 +34,12 @@ namespace Chaldea.Repositories
         public string AnimeId { get; set; }
 
         public string Desc { get; set; }
+
+        public string Auth { get; set; }
+
+        public string Publisher { get; set; }
+
+        public string Director { get; set; }
 
         public string State { get; set; }
 

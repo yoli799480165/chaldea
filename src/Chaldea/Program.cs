@@ -20,13 +20,7 @@ namespace Chaldea
 
         public static IWebHost CreateWebHostBuilder(string[] args)
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true, true)
-                .Build();
-
             return WebHost.CreateDefaultBuilder(args)
-                .UseConfiguration(config)
                 .ConfigureLogging((hostingContext, logging) =>
                 {
                     var loggingConfig = hostingContext.Configuration.GetSection("Logging");

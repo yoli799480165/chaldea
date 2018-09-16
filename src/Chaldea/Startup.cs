@@ -52,7 +52,7 @@ namespace Chaldea
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Open API V1"); });
             app.UseCors(DefaultCorsPolicyName);
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseStaticFiles(new StaticFileOptions
             {
