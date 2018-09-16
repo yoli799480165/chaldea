@@ -1,29 +1,31 @@
 ﻿using System.Collections.Generic;
-using Chaldea.Services;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 
 namespace Chaldea.Repositories
 {
-    public class Bangumi : IEntity<ObjectId>
+    public class Bangumi : IEntity<string>
     {
         public string Name { get; set; }
         public List<Anime> Animes { get; set; }
-        [BsonId] public ObjectId Id { get; set; }
+
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
-    public class Anime : IEntity<ObjectId>
+    public class Anime : IEntity<string>
     {
         public string Title { get; set; }
 
         public string Cover { get; set; }
 
-        [JsonConverter(typeof(ObjectIdConverter))]
-        [BsonId] public ObjectId Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
-    public class AnimeDetail : IEntity<ObjectId>
+    public class AnimeDetail : IEntity<string>
     {
         public string AnimeId { get; set; }
 
@@ -44,8 +46,8 @@ namespace Chaldea.Repositories
         public List<Comment> Comments { get; set; }
 
         [BsonId]
-        [JsonConverter(typeof(ObjectIdConverter))]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
     public class Resource
@@ -55,24 +57,39 @@ namespace Chaldea.Repositories
         public string Name { get; set; }
 
         public string Url { get; set; }
+
+        public MediaMetaData MetaData { get; set; }
     }
 
-    public class Comment : IEntity<ObjectId>
+    public class MediaMetaData
+    {
+        public int Duration { get; set; }
+        public int FrameWidth { get; set; }
+        public int FrameHeight { get; set; }
+        public int FrameRate { get; set; }
+    }
+
+    public class Comment : IEntity<string>
     {
         public string Content { get; set; }
 
-        public ObjectId Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
-    public class Banner : IEntity<ObjectId>
+    public class Banner : IEntity<string>
     {
         public string Image { get; set; }
         public string Link { get; set; }
         public string Title { get; set; }
-        public ObjectId Id { get; set; }
+
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
-    public class User : IEntity<ObjectId>
+    public class User : IEntity<string>
     {
         public string Uid { get; set; }
 
@@ -86,18 +103,24 @@ namespace Chaldea.Repositories
 
         public string ProfilePhoto { get; set; }
 
-        public ObjectId Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
-    public class Achievement : IEntity<ObjectId>
+    public class Achievement : IEntity<string>
     {
-        public ObjectId Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 
-    public class Image : IEntity<ObjectId>
+    public class Image : IEntity<string>
     {
         public string MetaData { get; set; }
 
-        public ObjectId Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
     }
 }

@@ -10,9 +10,9 @@ namespace Chaldea.Services
     [Route("api/bangumi")]
     public class BangumiService : ServiceBase
     {
-        private readonly IRepository<ObjectId, Bangumi> _bangumiRepository;
+        private readonly IRepository<string, Bangumi> _bangumiRepository;
 
-        public BangumiService(IRepository<ObjectId, Bangumi> bangumiRepository)
+        public BangumiService(IRepository<string, Bangumi> bangumiRepository)
         {
             _bangumiRepository = bangumiRepository;
         }

@@ -12,12 +12,12 @@ namespace Chaldea.Services
     [Route("api/anime")]
     public class AnimeService : ServiceBase
     {
-        private readonly IRepository<ObjectId, AnimeDetail> _animeDetailRepository;
-        private readonly IRepository<ObjectId, Bangumi> _bangumiRepository;
+        private readonly IRepository<string, AnimeDetail> _animeDetailRepository;
+        private readonly IRepository<string, Bangumi> _bangumiRepository;
 
         public AnimeService(
-            IRepository<ObjectId, Bangumi> bangumiRepository,
-            IRepository<ObjectId, AnimeDetail> animeDetailRepository)
+            IRepository<string, Bangumi> bangumiRepository,
+            IRepository<string, AnimeDetail> animeDetailRepository)
         {
             _bangumiRepository = bangumiRepository;
             _animeDetailRepository = animeDetailRepository;
@@ -27,12 +27,10 @@ namespace Chaldea.Services
         [HttpGet]
         public async Task<ICollection<Anime>> GetList(string bangumiId, int skip, int take)
         {
-            var id = RepositoryHelper.GetInternalId(bangumiId);
-
-            if (skip == 0 && take == 0) return (await _bangumiRepository.GetAsync(id)).Animes;
+            if (skip == 0 && take == 0) return (await _bangumiRepository.GetAsync(bangumiId)).Animes;
             var query = Builders<Bangumi>.Projection.Slice(x => x.Animes, skip, take);
             var bangumi = await _bangumiRepository
-                .GetAll(x => x.Id == id)
+                .GetAll(x => x.Id == bangumiId)
                 .Project<Bangumi>(query).FirstOrDefaultAsync();
             return bangumi.Animes;
         }
@@ -41,7 +39,7 @@ namespace Chaldea.Services
         [HttpPost]
         public async Task Update(string bangumiId, [FromBody] Anime input)
         {
-            var filter = Builders<Bangumi>.Filter.Eq("_id", RepositoryHelper.GetInternalId(bangumiId)) &
+            var filter = Builders<Bangumi>.Filter.Eq("_id", bangumiId) &
                          Builders<Bangumi>.Filter.Eq("animes._id", input.Id);
             var update = Builders<Bangumi>.Update.Set("animes.$", input);
 

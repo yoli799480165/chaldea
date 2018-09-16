@@ -11,13 +11,13 @@ namespace Chaldea.Services
 {
     public class MigrateService : ServiceBase
     {
-        private readonly IRepository<ObjectId, AnimeDetail> _animeDetailRepository;
-        private readonly IRepository<ObjectId, Bangumi> _bangumiRepository;
+        private readonly IRepository<string, AnimeDetail> _animeDetailRepository;
+        private readonly IRepository<string, Bangumi> _bangumiRepository;
         private readonly string _baseDir = Directory.GetCurrentDirectory();
 
         public MigrateService(
-            IRepository<ObjectId, Bangumi> bangumiRepository,
-            IRepository<ObjectId, AnimeDetail> animeDetailRepository
+            IRepository<string, Bangumi> bangumiRepository,
+            IRepository<string, AnimeDetail> animeDetailRepository
         )
         {
             _bangumiRepository = bangumiRepository;
@@ -44,7 +44,7 @@ namespace Chaldea.Services
                 {
                     var bangumi = new Bangumi
                     {
-                        Id = ObjectId.GenerateNewId(),
+                        Id = ObjectId.GenerateNewId().ToString(),
                         Name = data.Name,
                         Animes = new List<Anime>()
                     };
@@ -54,7 +54,7 @@ namespace Chaldea.Services
                         // 创建Anime简单信息
                         var anime = new Anime
                         {
-                            Id = ObjectId.GenerateNewId(),
+                            Id = ObjectId.GenerateNewId().ToString(),
                             Cover = item.ImgName,
                             Title = item.Title
                         };
@@ -64,8 +64,8 @@ namespace Chaldea.Services
                         // 创建Anime详细信息
                         var animeDetail = new AnimeDetail
                         {
-                            Id = ObjectId.GenerateNewId(),
-                            AnimeId = anime.Id.ToString(),
+                            Id = ObjectId.GenerateNewId().ToString(),
+                            AnimeId = anime.Id,
                             Desc = item.Desc.Replace("简介：\n", "").Trim(),
                             Animes = new List<Resource>(),
                             Comics = new List<Resource>(),

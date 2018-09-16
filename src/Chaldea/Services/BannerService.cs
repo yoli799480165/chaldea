@@ -10,9 +10,9 @@ namespace Chaldea.Services
     [Route("api/banner")]
     public class BannerService : ServiceBase
     {
-        private readonly IRepository<ObjectId, Banner> _bannerRepository;
+        private readonly IRepository<string, Banner> _bannerRepository;
 
-        public BannerService(IRepository<ObjectId, Banner> bannerRepository)
+        public BannerService(IRepository<string, Banner> bannerRepository)
         {
             _bannerRepository = bannerRepository;
         }
@@ -21,7 +21,7 @@ namespace Chaldea.Services
         [HttpPut]
         public async Task Add([FromBody] Banner banner)
         {
-            banner.Id = ObjectId.GenerateNewId();
+            banner.Id = ObjectId.GenerateNewId().ToString();
             await _bannerRepository.AddAsync(banner);
         }
 

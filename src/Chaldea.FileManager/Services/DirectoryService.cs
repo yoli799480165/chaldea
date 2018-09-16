@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Chaldea.FileManager.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using NReco.VideoInfo;
 
 namespace Chaldea.FileManager.Services
 {
@@ -30,7 +31,8 @@ namespace Chaldea.FileManager.Services
                 Name = x.Name,
                 FullName = x.FullName,
                 DirectoryName = x.DirectoryName,
-                Size = Filesize(x.Length)
+                Size = Filesize(x.Length),
+                Media = MediaHelper.GetMediaInfo(x.FullName)
             }).ToList();
         }
 
@@ -126,6 +128,16 @@ namespace Chaldea.FileManager.Services
         public string DirectoryName { get; set; }
 
         public string Size { get; set; }
+
+        public MediaInfo Media { get; set; }
+    }
+
+    public class MediaInfo
+    {
+        public int Duration { get; set; }
+        public int FrameWidth { get; set; }
+        public int FrameHeight { get; set; }
+        public int FrameRate { get; set; }
     }
 
     public class GetFilesDto
@@ -235,5 +247,26 @@ namespace Chaldea.FileManager.Services
         //         fileList.AddRange(files);
         //     }
         // }
+    }
+
+    public static class MediaHelper
+    {
+        private static readonly FFProbe FfProbe = new NReco.VideoInfo.FFProbe();
+
+        public static MediaInfo GetMediaInfo(string path)
+        {
+            var media = new MediaInfo();
+            var videoInfo = FfProbe.GetMediaInfo(path);
+            media.Duration = Convert.ToInt32(videoInfo.Duration.TotalSeconds);
+            if (videoInfo.Streams.Length > 0)
+            {
+                var frame = videoInfo.Streams[0];
+                media.FrameHeight = frame.Height;
+                media.FrameWidth = frame.Width;
+                media.FrameRate = Convert.ToInt32(frame.FrameRate);
+            }
+
+            return media;
+        }
     }
 }
