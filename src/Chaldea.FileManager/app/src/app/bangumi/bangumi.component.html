@@ -1,0 +1,40 @@
+<div class="bangumi">
+  <div class="toolbar">
+    <div class="operate">
+      <button>
+        <i class="fa fa-upload"></i>上传</button>
+      <button>
+        <i class="fa fa-upload"></i>下载</button>
+      <button>
+        <i class="fa fa-upload"></i>删除</button>
+      <button>
+        <i class="fa fa-upload"></i>分享</button>
+      <button>
+        <i class="fa fa-upload"></i>新建番组</button>
+    </div>
+    <div class="nav">
+      <a class="btn-item" (click)="goHome()">
+        <i class="fa fa-home"></i>
+      </a>
+      <a class="btn-item" (click)="back()">
+        <i class="fa fa-chevron-left"></i>
+      </a>
+      <a class="btn-item" (click)="forward()">
+        <i class="fa fa-chevron-right"></i>
+      </a>
+      <a class="btn-item">
+        <i class="fa fa-refresh"></i>
+      </a>
+      <span class="split">
+      </span>
+      <a class="crumbs">
+        {{selectPath}}
+      </a>
+    </div>
+  </div>
+  <div class="list">
+    <app-bangumi-list *ngIf="listType == 'bangumi'" (showAnimes)="showAnimes($event)"></app-bangumi-list>
+    <app-bangumi-anime *ngIf="listType == 'anime'" [animes]="selectBangumi.animes" (showDetail)="showDetail($event)"></app-bangumi-anime>
+    <app-bangumi-anime-detail *ngIf="listType == 'anime-detail'" [anime]="selectAnime" [bangumi]="selectBangumi"></app-bangumi-anime-detail>
+  </div>
+</div>

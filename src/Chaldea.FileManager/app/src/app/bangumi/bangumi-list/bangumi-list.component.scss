@@ -1,0 +1,23 @@
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0px;
+    tr {
+        th {
+            padding: 5px;
+            color: #757880;
+            border: none;
+        }
+        td {
+            padding: 10px 5px;
+            border-top: 1px solid #f6f6f7;
+        }
+        .check {
+            width: 50px;
+            text-align: center;
+        }
+    }
+    tr:hover {
+        background-color: #ecf1ff;
+    }
+}

@@ -1,0 +1,22 @@
+<table class="list-table">
+  <thead>
+    <tr>
+      <th class="check">
+        <input type="checkbox">
+      </th>
+      <th>名称</th>
+      <th>数量</th>
+      <th>日期</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let bangumi of bangumis" (dblclick)="showAnimes.emit(bangumi)">
+      <td class="check">
+        <input type="checkbox">
+      </td>
+      <td>{{bangumi.name}}</td>
+      <td>{{bangumi.animes.length}}</td>
+      <td>{{bangumi.name}}</td>
+    </tr>
+  </tbody>
+</table>
