@@ -1,7 +1,5 @@
-﻿using System.IO;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 
@@ -27,6 +25,9 @@ namespace Chaldea
                     logging.AddFile(loggingConfig.GetSection("Serilog"));
                 })
                 .UseStartup<Startup>()
+#if DEBUG
+                .UseUrls("http://*:9001")
+#endif
                 .Build();
         }
     }

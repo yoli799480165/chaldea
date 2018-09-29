@@ -77,6 +77,7 @@ namespace Chaldea.Repositories
         public int FrameWidth { get; set; }
         public int FrameHeight { get; set; }
         public int FrameRate { get; set; }
+        public long Length { get; set; }
     }
 
     public class Comment : IEntity<string>
@@ -101,15 +102,9 @@ namespace Chaldea.Repositories
 
     public class User : IEntity<string>
     {
-        public string Uid { get; set; }
+        public string SubjectId { get; set; }
 
         public string NickName { get; set; }
-
-        public string Name { get; set; }
-
-        public string Account { get; set; }
-
-        public string Password { get; set; }
 
         public string ProfilePhoto { get; set; }
 

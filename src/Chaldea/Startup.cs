@@ -24,6 +24,7 @@ namespace Chaldea
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDB"));
             services.AddCors(options =>
             {
                 options.AddPolicy(DefaultCorsPolicyName, builder =>
@@ -35,12 +36,20 @@ namespace Chaldea
                         .AllowCredentials();
                 });
             });
+            services.AddMvcCore()
+                .AddAuthorization()
+                .AddJsonFormatters()
+                .AddApiExplorer()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = Configuration.GetSection("Authentication:IdentityServerUrl").Value;
+                    options.RequireHttpsMetadata = false;
 
-            services.AddMvcCore().AddJsonFormatters().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddApiExplorer();
+                    options.ApiName = "api1";
+                });
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
-
-            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDB"));
             services.AddTransient<ChaldeaDbContext>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
         }
@@ -53,7 +62,7 @@ namespace Chaldea
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Open API V1"); });
             app.UseCors(DefaultCorsPolicyName);
             // app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "statics")),

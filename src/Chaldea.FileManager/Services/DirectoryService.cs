@@ -32,6 +32,7 @@ namespace Chaldea.FileManager.Services
                 FullName = x.FullName,
                 DirectoryName = x.DirectoryName,
                 Size = Filesize(x.Length),
+                Length = x.Length,
                 Media = MediaHelper.GetMediaInfo(x.FullName)
             }).ToList();
         }
@@ -128,6 +129,8 @@ namespace Chaldea.FileManager.Services
         public string DirectoryName { get; set; }
 
         public string Size { get; set; }
+
+        public long Length { get; set; }
 
         public MediaInfo Media { get; set; }
     }
@@ -252,6 +255,11 @@ namespace Chaldea.FileManager.Services
     public static class MediaHelper
     {
         private static readonly FFProbe FfProbe = new NReco.VideoInfo.FFProbe();
+
+        static MediaHelper()
+        {
+            FfProbe.FFProbeExeName = "ffprobe";
+        }
 
         public static MediaInfo GetMediaInfo(string path)
         {
