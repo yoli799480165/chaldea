@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Chaldea.IdentityServer.Repositories;
+using Chaldea.IdentityServer.Utilities;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
@@ -20,7 +21,7 @@ namespace Chaldea.IdentityServer.Configuration
         {
             //根据context.UserName和context.Password与数据库的数据做校验，判断是否合法
             var user = await _userRepository.GetAsync(x =>
-                x.Name == context.UserName && x.Password == context.Password);
+                x.PhoneNumber == context.UserName && x.Password == Md5Helper.Md5(context.Password));
             if (user != null)
                 context.Result = new GrantValidationResult(
                     user.Id,
@@ -38,12 +39,9 @@ namespace Chaldea.IdentityServer.Configuration
             {
                 new Claim("userId", user.Id),
                 new Claim(JwtClaimTypes.Name, user.Name),
-                new Claim(JwtClaimTypes.GivenName, user.GivenName),
-                new Claim(JwtClaimTypes.FamilyName, user.FamilyName),
                 new Claim(JwtClaimTypes.Email, user.Email),
-                new Claim(JwtClaimTypes.EmailVerified, user.EmailVerified.ToString(), ClaimValueTypes.Boolean),
-                new Claim(JwtClaimTypes.WebSite, user.WebSite),
-                new Claim(JwtClaimTypes.Address, user.Address)
+                new Claim(JwtClaimTypes.PhoneNumber, user.PhoneNumber),
+                new Claim(JwtClaimTypes.Role, user.Role)
             };
         }
     }

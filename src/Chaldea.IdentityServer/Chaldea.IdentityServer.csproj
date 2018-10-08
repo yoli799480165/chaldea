@@ -16,15 +16,29 @@
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0-dev-00023" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="aliyun-net-sdk-core">
+      <HintPath>..\..\packages\aliyun\aliyun-net-sdk-core.dll</HintPath>
+    </Reference>
+    <Reference Include="aliyun-net-sdk-dysmsapi">
+      <HintPath>..\..\packages\aliyun\aliyun-net-sdk-dysmsapi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Identity.Core">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.identity.core\2.1.1\lib\netstandard2.0\Microsoft.Extensions.Identity.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

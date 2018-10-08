@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea", "src\Chaldea\Chal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.FileManager", "src\Chaldea.FileManager\Chaldea.FileManager.csproj", "{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaldea.IdentityServer", "src\Chaldea.IdentityServer\Chaldea.IdentityServer.csproj", "{01FF59BB-E7BD-4213-94DA-CE88E61E40D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.IdentityServer", "src\Chaldea.IdentityServer\Chaldea.IdentityServer.csproj", "{01FF59BB-E7BD-4213-94DA-CE88E61E40D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{89E2E7FB-67AF-4E55-92E3-3B2035BCBDC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.TestingClient", "test\IdentityServer4.TestingClient\IdentityServer4.TestingClient.csproj", "{D70B9EC2-8AB9-4591-AB6D-719F20A83DA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +41,10 @@ Global
 		{01FF59BB-E7BD-4213-94DA-CE88E61E40D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01FF59BB-E7BD-4213-94DA-CE88E61E40D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01FF59BB-E7BD-4213-94DA-CE88E61E40D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D70B9EC2-8AB9-4591-AB6D-719F20A83DA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D70B9EC2-8AB9-4591-AB6D-719F20A83DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D70B9EC2-8AB9-4591-AB6D-719F20A83DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D70B9EC2-8AB9-4591-AB6D-719F20A83DA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +54,7 @@ Global
 		{665D2F5D-B818-4866-817B-641F76F52939} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 		{2F25EEC7-8E33-46EF-9707-5FFD50A9DB57} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 		{01FF59BB-E7BD-4213-94DA-CE88E61E40D2} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
+		{D70B9EC2-8AB9-4591-AB6D-719F20A83DA6} = {89E2E7FB-67AF-4E55-92E3-3B2035BCBDC2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8FB94BA5-79C6-45F9-9972-8118990A9522}

@@ -100,19 +100,6 @@ namespace Chaldea.Repositories
         public string Id { get; set; }
     }
 
-    public class User : IEntity<string>
-    {
-        public string SubjectId { get; set; }
-
-        public string NickName { get; set; }
-
-        public string ProfilePhoto { get; set; }
-
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-    }
-
     public class Achievement : IEntity<string>
     {
         [BsonId]
