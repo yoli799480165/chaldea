@@ -54,7 +54,7 @@ namespace Chaldea.Repositories
 
     public class Video : IEntity<string>
     {
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         public string Url { get; set; }
 
