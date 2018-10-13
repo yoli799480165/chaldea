@@ -89,5 +89,16 @@ namespace Chaldea.Repositories
         {
             return _db.Find(predicate ?? (_ => true));
         }
+
+        public IFindFluent<TEntity, TEntity> GetAll(FilterDefinition<TEntity> filter)
+        {
+            return _db.Find(filter);
+        }
+
+        public IAsyncCursor<TResult> Aggregate<TResult>(PipelineDefinition<TEntity, TResult> pipeline)
+        {
+            return _db.Aggregate(pipeline);
+        }
+        
     }
 }

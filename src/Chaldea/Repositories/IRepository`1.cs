@@ -32,6 +32,8 @@ namespace Chaldea.Repositories
 
         IFindFluent<TEntity, TEntity> GetAll(Expression<Func<TEntity, bool>> predicate = null);
 
+        IFindFluent<TEntity, TEntity> GetAll(FilterDefinition<TEntity> filter);
+
         Task<List<TEntity>> GetAllListAsync();
 
         Task<List<TEntity>> GetAllListAsync(ProjectionDefinition<TEntity> filter);
@@ -44,6 +46,8 @@ namespace Chaldea.Repositories
         Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate);
 
         Task<TEntity> GetAsync(TKey id);
+
+        IAsyncCursor<TResult> Aggregate<TResult>(PipelineDefinition<TEntity, TResult> pipeline);
     }
 
     public interface IRepository<TEntity> : IRepository<int, TEntity>

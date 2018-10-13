@@ -1,0 +1,15 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">创建/修改番组</h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="form-group">
+    <label>名称:</label>
+    <input type="text" class="form-control" placeholder="名称" [(ngModel)]="input.name">
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-info btn-fill" (click)="save()">保存</button>
+</div>

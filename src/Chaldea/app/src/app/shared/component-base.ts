@@ -13,6 +13,10 @@ export class ComponentBase {
     this.dialog = injector.get(NgxCoolDialogsService);
   }
 
+  closeModal(): void {
+    this.modal.close();
+  }
+
   showTips(msg: string, type: string): void {
     // 'info', 'success', 'warning', 'danger'
     const color = Math.floor((Math.random() * 4) + 1);

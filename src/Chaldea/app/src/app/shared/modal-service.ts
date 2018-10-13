@@ -34,6 +34,8 @@ export class ModalService {
         if (this.modalSubject) {
             this.modalSubject = undefined;
         }
+
+        this.modalRef.hide();
     }
 
     getData<T>(): T {

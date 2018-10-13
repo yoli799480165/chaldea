@@ -23,7 +23,7 @@ import * as moment from 'moment';
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 @Injectable()
-export class ConsumerServiceProxy {
+export class BangumiServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -34,143 +34,30 @@ export class ConsumerServiceProxy {
     }
 
     /**
-     * @sourceId (optional) 
-     * @groupId (optional) 
+     * @input (optional) 
      * @return Success
      */
-    create(sourceId: string | null, groupId: string | null): Observable<string> {
-        let url_ = this.baseUrl + "/api/hurricane/consumer/create?";
-        if (sourceId !== undefined)
-            url_ += "sourceId=" + encodeURIComponent("" + sourceId) + "&"; 
-        if (groupId !== undefined)
-            url_ += "groupId=" + encodeURIComponent("" + groupId) + "&"; 
+    createOrUpdate(input: BangumiEditDto | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/bangumi/createOrUpdate";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(input);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json", 
-                "Accept": "application/json"
             })
         };
 
         return this.http.request("put", url_, options_).flatMap((response_ : any) => {
-            return this.processCreate(response_);
+            return this.processCreateOrUpdate(response_);
         }).catch((response_: any) => {
             if (response_ instanceof HttpResponse) {
                 try {
-                    return this.processCreate(response_);
-                } catch (e) {
-                    return <Observable<string>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<string>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processCreate(response: HttpResponse<Blob>): Observable<string> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<string>(<any>null);
-    }
-
-    /**
-     * @sourceIds (optional) 
-     * @return Success
-     */
-    getConsumers(sourceIds: string[] | null): Observable<ConsumerDto[]> {
-        let url_ = this.baseUrl + "/api/hurricane/consumer/getConsumers?";
-        if (sourceIds !== undefined)
-            sourceIds && sourceIds.forEach(item => { url_ += "sourceIds=" + encodeURIComponent("" + item) + "&"; });
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processGetConsumers(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processGetConsumers(response_);
-                } catch (e) {
-                    return <Observable<ConsumerDto[]>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<ConsumerDto[]>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processGetConsumers(response: HttpResponse<Blob>): Observable<ConsumerDto[]> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (resultData200 && resultData200.constructor === Array) {
-                result200 = [];
-                for (let item of resultData200)
-                    result200.push(ConsumerDto.fromJS(item));
-            }
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<ConsumerDto[]>(<any>null);
-    }
-
-    /**
-     * @includeKey (optional) 
-     * @return Success
-     */
-    consume(consumerId: string, includeKey: boolean | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/consumer/{consumerId}/consume?";
-        if (consumerId === undefined || consumerId === null)
-            throw new Error("The parameter 'consumerId' must be defined.");
-        url_ = url_.replace("{consumerId}", encodeURIComponent("" + consumerId)); 
-        if (includeKey !== undefined)
-            url_ += "includeKey=" + encodeURIComponent("" + includeKey) + "&"; 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processConsume(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processConsume(response_);
+                    return this.processCreateOrUpdate(response_);
                 } catch (e) {
                     return <Observable<void>><any>Observable.throw(e);
                 }
@@ -179,7 +66,7 @@ export class ConsumerServiceProxy {
         });
     }
 
-    protected processConsume(response: HttpResponse<Blob>): Observable<void> {
+    protected processCreateOrUpdate(response: HttpResponse<Blob>): Observable<void> {
         const status = response.status; 
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
@@ -198,11 +85,11 @@ export class ConsumerServiceProxy {
     /**
      * @return Success
      */
-    delete(consumerId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/consumer/{consumerId}/delete";
-        if (consumerId === undefined || consumerId === null)
-            throw new Error("The parameter 'consumerId' must be defined.");
-        url_ = url_.replace("{consumerId}", encodeURIComponent("" + consumerId)); 
+    delete(id: string): Observable<void> {
+        let url_ = this.baseUrl + "/api/bangumi/{id}/delete";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -244,433 +131,10 @@ export class ConsumerServiceProxy {
     }
 
     /**
-     * @commits (optional) 
      * @return Success
      */
-    commit(consumerId: string, commits: any[] | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/consumer/{consumerId}/commit?";
-        if (consumerId === undefined || consumerId === null)
-            throw new Error("The parameter 'consumerId' must be defined.");
-        url_ = url_.replace("{consumerId}", encodeURIComponent("" + consumerId)); 
-        if (commits !== undefined)
-            commits && commits.forEach((item, index) => { 
-                for (let attr in item)
-                    url_ += "commits[" + index + "]." + attr + "=" + encodeURIComponent("" + item[attr]) + "&";
-            });
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processCommit(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processCommit(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processCommit(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-}
-
-@Injectable()
-export class GraphinstanceServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
-    }
-
-    /**
-     * @return Success
-     */
-    list(): Observable<GraphInstance[]> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/list";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processList(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processList(response_);
-                } catch (e) {
-                    return <Observable<GraphInstance[]>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<GraphInstance[]>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processList(response: HttpResponse<Blob>): Observable<GraphInstance[]> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (resultData200 && resultData200.constructor === Array) {
-                result200 = [];
-                for (let item of resultData200)
-                    result200.push(GraphInstance.fromJS(item));
-            }
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<GraphInstance[]>(<any>null);
-    }
-
-    /**
-     * @instanceId (optional) 
-     * @return Success
-     */
-    getInstance(instanceId: string | null): Observable<GraphInstanceDto> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/getInstance?";
-        if (instanceId !== undefined)
-            url_ += "instanceId=" + encodeURIComponent("" + instanceId) + "&"; 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processGetInstance(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processGetInstance(response_);
-                } catch (e) {
-                    return <Observable<GraphInstanceDto>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<GraphInstanceDto>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processGetInstance(response: HttpResponse<Blob>): Observable<GraphInstanceDto> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? GraphInstanceDto.fromJS(resultData200) : new GraphInstanceDto();
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<GraphInstanceDto>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    start(instanceId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/{instanceId}/start";
-        if (instanceId === undefined || instanceId === null)
-            throw new Error("The parameter 'instanceId' must be defined.");
-        url_ = url_.replace("{instanceId}", encodeURIComponent("" + instanceId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processStart(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processStart(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processStart(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    stop(instanceId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/{instanceId}/stop";
-        if (instanceId === undefined || instanceId === null)
-            throw new Error("The parameter 'instanceId' must be defined.");
-        url_ = url_.replace("{instanceId}", encodeURIComponent("" + instanceId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processStop(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processStop(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processStop(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @graphId (optional) 
-     * @return Success
-     */
-    create(graphId: string | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/create?";
-        if (graphId !== undefined)
-            url_ += "graphId=" + encodeURIComponent("" + graphId) + "&"; 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
-            return this.processCreate(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processCreate(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processCreate(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    send(instanceId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/{instanceId}/send";
-        if (instanceId === undefined || instanceId === null)
-            throw new Error("The parameter 'instanceId' must be defined.");
-        url_ = url_.replace("{instanceId}", encodeURIComponent("" + instanceId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processSend(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processSend(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processSend(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    delete(instanceId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/graphinstance/{instanceId}/delete";
-        if (instanceId === undefined || instanceId === null)
-            throw new Error("The parameter 'instanceId' must be defined.");
-        url_ = url_.replace("{instanceId}", encodeURIComponent("" + instanceId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
-            return this.processDelete(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processDelete(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processDelete(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-}
-
-@Injectable()
-export class GraphServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
-    }
-
-    /**
-     * @return Success
-     */
-    getList(): Observable<Graph[]> {
-        let url_ = this.baseUrl + "/api/hurricane/graph/getList";
+    getList(): Observable<BangumiDto[]> {
+        let url_ = this.baseUrl + "/api/bangumi/getList";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -689,14 +153,14 @@ export class GraphServiceProxy {
                 try {
                     return this.processGetList(response_);
                 } catch (e) {
-                    return <Observable<Graph[]>><any>Observable.throw(e);
+                    return <Observable<BangumiDto[]>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<Graph[]>><any>Observable.throw(response_);
+                return <Observable<BangumiDto[]>><any>Observable.throw(response_);
         });
     }
 
-    protected processGetList(response: HttpResponse<Blob>): Observable<Graph[]> {
+    protected processGetList(response: HttpResponse<Blob>): Observable<BangumiDto[]> {
         const status = response.status; 
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
@@ -707,7 +171,7 @@ export class GraphServiceProxy {
             if (resultData200 && resultData200.constructor === Array) {
                 result200 = [];
                 for (let item of resultData200)
-                    result200.push(Graph.fromJS(item));
+                    result200.push(BangumiDto.fromJS(item));
             }
             return Observable.of(result200);
             });
@@ -716,227 +180,18 @@ export class GraphServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<Graph[]>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    getListWithOnlyName(): Observable<DropdownItem[]> {
-        let url_ = this.baseUrl + "/api/hurricane/graph/getListWithOnlyName";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processGetListWithOnlyName(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processGetListWithOnlyName(response_);
-                } catch (e) {
-                    return <Observable<DropdownItem[]>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<DropdownItem[]>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processGetListWithOnlyName(response: HttpResponse<Blob>): Observable<DropdownItem[]> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (resultData200 && resultData200.constructor === Array) {
-                result200 = [];
-                for (let item of resultData200)
-                    result200.push(DropdownItem.fromJS(item));
-            }
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<DropdownItem[]>(<any>null);
-    }
-}
-
-@Injectable()
-export class MigrationServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
-    }
-
-    /**
-     * @return Success
-     */
-    schema(): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/migration/schema";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processSchema(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processSchema(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processSchema(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    source(): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/migration/source";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processSource(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processSource(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processSource(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    graph(): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/migration/graph";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processGraph(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processGraph(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processGraph(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-}
-
-@Injectable()
-export class SchemaServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        return Observable.of<BangumiDto[]>(<any>null);
     }
 
     /**
      * @input (optional) 
      * @return Success
      */
-    create(input: SchemaCreateDto | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/schema/create";
+    import(id: string, input: ImportBangumiDto | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/bangumi/{id}/import";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(input);
@@ -950,12 +205,12 @@ export class SchemaServiceProxy {
             })
         };
 
-        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
-            return this.processCreate(response_);
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processImport(response_);
         }).catch((response_: any) => {
             if (response_ instanceof HttpResponse) {
                 try {
-                    return this.processCreate(response_);
+                    return this.processImport(response_);
                 } catch (e) {
                     return <Observable<void>><any>Observable.throw(e);
                 }
@@ -964,7 +219,68 @@ export class SchemaServiceProxy {
         });
     }
 
-    protected processCreate(response: HttpResponse<Blob>): Observable<void> {
+    protected processImport(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+}
+
+@Injectable()
+export class BannerServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @banner (optional) 
+     * @return Success
+     */
+    add(banner: Banner | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/banner/add";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(banner);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
+            return this.processAdd(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processAdd(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processAdd(response: HttpResponse<Blob>): Observable<void> {
         const status = response.status; 
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
@@ -981,10 +297,16 @@ export class SchemaServiceProxy {
     }
 
     /**
+     * @skip (optional) 
+     * @take (optional) 
      * @return Success
      */
-    getList(): Observable<Schema[]> {
-        let url_ = this.baseUrl + "/api/hurricane/schema/getList";
+    getList(skip: number | null, take: number | null): Observable<Banner[]> {
+        let url_ = this.baseUrl + "/api/banner/getList?";
+        if (skip !== undefined)
+            url_ += "skip=" + encodeURIComponent("" + skip) + "&"; 
+        if (take !== undefined)
+            url_ += "take=" + encodeURIComponent("" + take) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1003,14 +325,14 @@ export class SchemaServiceProxy {
                 try {
                     return this.processGetList(response_);
                 } catch (e) {
-                    return <Observable<Schema[]>><any>Observable.throw(e);
+                    return <Observable<Banner[]>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<Schema[]>><any>Observable.throw(response_);
+                return <Observable<Banner[]>><any>Observable.throw(response_);
         });
     }
 
-    protected processGetList(response: HttpResponse<Blob>): Observable<Schema[]> {
+    protected processGetList(response: HttpResponse<Blob>): Observable<Banner[]> {
         const status = response.status; 
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
@@ -1021,7 +343,7 @@ export class SchemaServiceProxy {
             if (resultData200 && resultData200.constructor === Array) {
                 result200 = [];
                 for (let item of resultData200)
-                    result200.push(Schema.fromJS(item));
+                    result200.push(Banner.fromJS(item));
             }
             return Observable.of(result200);
             });
@@ -1030,105 +352,12 @@ export class SchemaServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<Schema[]>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    update(): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/schema/update";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processUpdate(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processUpdate(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processUpdate(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    delete(schemaId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/schema/{schemaId}/delete";
-        if (schemaId === undefined || schemaId === null)
-            throw new Error("The parameter 'schemaId' must be defined.");
-        url_ = url_.replace("{schemaId}", encodeURIComponent("" + schemaId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
-            return this.processDelete(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processDelete(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processDelete(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
+        return Observable.of<Banner[]>(<any>null);
     }
 }
 
 @Injectable()
-export class SourceServiceProxy {
+export class UserServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -1141,8 +370,8 @@ export class SourceServiceProxy {
     /**
      * @return Success
      */
-    getList(): Observable<SourceDto[]> {
-        let url_ = this.baseUrl + "/api/hurricane/source/getList";
+    getUsers(): Observable<void> {
+        let url_ = this.baseUrl + "/api/user/getUsers";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1150,72 +379,15 @@ export class SourceServiceProxy {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json", 
-                "Accept": "application/json"
             })
         };
 
         return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processGetList(response_);
+            return this.processGetUsers(response_);
         }).catch((response_: any) => {
             if (response_ instanceof HttpResponse) {
                 try {
-                    return this.processGetList(response_);
-                } catch (e) {
-                    return <Observable<SourceDto[]>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<SourceDto[]>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processGetList(response: HttpResponse<Blob>): Observable<SourceDto[]> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (resultData200 && resultData200.constructor === Array) {
-                result200 = [];
-                for (let item of resultData200)
-                    result200.push(SourceDto.fromJS(item));
-            }
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<SourceDto[]>(<any>null);
-    }
-
-    /**
-     * @input (optional) 
-     * @return Success
-     */
-    create(input: SourceDto | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/source/create";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(input);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
-            return this.processCreate(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processCreate(response_);
+                    return this.processGetUsers(response_);
                 } catch (e) {
                     return <Observable<void>><any>Observable.throw(e);
                 }
@@ -1224,152 +396,7 @@ export class SourceServiceProxy {
         });
     }
 
-    protected processCreate(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @input (optional) 
-     * @return Success
-     */
-    update(input: SourceDto | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/source/update";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(input);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
-            return this.processUpdate(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processUpdate(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processUpdate(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    delete(sourceId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/source/{sourceId}/delete";
-        if (sourceId === undefined || sourceId === null)
-            throw new Error("The parameter 'sourceId' must be defined.");
-        url_ = url_.replace("{sourceId}", encodeURIComponent("" + sourceId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
-            return this.processDelete(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processDelete(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processDelete(response: HttpResponse<Blob>): Observable<void> {
-        const status = response.status; 
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(response.body).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    produce(sourceId: string): Observable<void> {
-        let url_ = this.baseUrl + "/api/hurricane/source/{sourceId}/produce";
-        if (sourceId === undefined || sourceId === null)
-            throw new Error("The parameter 'sourceId' must be defined.");
-        url_ = url_.replace("{sourceId}", encodeURIComponent("" + sourceId)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
-            return this.processProduce(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponse) {
-                try {
-                    return this.processProduce(response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processProduce(response: HttpResponse<Blob>): Observable<void> {
+    protected processGetUsers(response: HttpResponse<Blob>): Observable<void> {
         const status = response.status; 
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
@@ -1386,192 +413,11 @@ export class SourceServiceProxy {
     }
 }
 
-export class ConsumerDto implements IConsumerDto {
+export class BangumiEditDto implements IBangumiEditDto {
     id: string | undefined;
-    sourceId: string | undefined;
-    groupId: string | undefined;
-    partitions: { [key: string] : number; } | undefined;
-    totalSize: number | undefined;
-
-    constructor(data?: IConsumerDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.id = data["id"];
-            this.sourceId = data["sourceId"];
-            this.groupId = data["groupId"];
-            if (data["partitions"]) {
-                this.partitions = {};
-                for (let key in data["partitions"]) {
-                    if (data["partitions"].hasOwnProperty(key))
-                        this.partitions[key] = data["partitions"][key];
-                }
-            }
-            this.totalSize = data["totalSize"];
-        }
-    }
-
-    static fromJS(data: any): ConsumerDto {
-        let result = new ConsumerDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["sourceId"] = this.sourceId;
-        data["groupId"] = this.groupId;
-        if (this.partitions) {
-            data["partitions"] = {};
-            for (let key in this.partitions) {
-                if (this.partitions.hasOwnProperty(key))
-                    data["partitions"][key] = this.partitions[key];
-            }
-        }
-        data["totalSize"] = this.totalSize;
-        return data; 
-    }
-}
-
-export interface IConsumerDto {
-    id: string | undefined;
-    sourceId: string | undefined;
-    groupId: string | undefined;
-    partitions: { [key: string] : number; } | undefined;
-    totalSize: number | undefined;
-}
-
-export class CommitDto implements ICommitDto {
-    partition: number | undefined;
-    offset: number | undefined;
-
-    constructor(data?: ICommitDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.partition = data["partition"];
-            this.offset = data["offset"];
-        }
-    }
-
-    static fromJS(data: any): CommitDto {
-        let result = new CommitDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["partition"] = this.partition;
-        data["offset"] = this.offset;
-        return data; 
-    }
-}
-
-export interface ICommitDto {
-    partition: number | undefined;
-    offset: number | undefined;
-}
-
-export class GraphInstance implements IGraphInstance {
-    schemas: Schema[] | undefined;
-    sources: Source[] | undefined;
-    graph: Graph | undefined;
-    config: string | undefined;
-    state: GraphInstanceState | undefined;
-    id: string | undefined;
-
-    constructor(data?: IGraphInstance) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            if (data["schemas"] && data["schemas"].constructor === Array) {
-                this.schemas = [];
-                for (let item of data["schemas"])
-                    this.schemas.push(Schema.fromJS(item));
-            }
-            if (data["sources"] && data["sources"].constructor === Array) {
-                this.sources = [];
-                for (let item of data["sources"])
-                    this.sources.push(Source.fromJS(item));
-            }
-            this.graph = data["graph"] ? Graph.fromJS(data["graph"]) : <any>undefined;
-            this.config = data["config"];
-            this.state = data["state"];
-            this.id = data["id"];
-        }
-    }
-
-    static fromJS(data: any): GraphInstance {
-        let result = new GraphInstance();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (this.schemas && this.schemas.constructor === Array) {
-            data["schemas"] = [];
-            for (let item of this.schemas)
-                data["schemas"].push(item.toJSON());
-        }
-        if (this.sources && this.sources.constructor === Array) {
-            data["sources"] = [];
-            for (let item of this.sources)
-                data["sources"].push(item.toJSON());
-        }
-        data["graph"] = this.graph ? this.graph.toJSON() : <any>undefined;
-        data["config"] = this.config;
-        data["state"] = this.state;
-        data["id"] = this.id;
-        return data; 
-    }
-}
-
-export interface IGraphInstance {
-    schemas: Schema[] | undefined;
-    sources: Source[] | undefined;
-    graph: Graph | undefined;
-    config: string | undefined;
-    state: GraphInstanceState | undefined;
-    id: string | undefined;
-}
-
-export class Schema implements ISchema {
-    alias: string | undefined;
-    arraySchema: Schema | undefined;
-    dictKeySchema: Schema | undefined;
-    dictValueSchema: Schema | undefined;
-    index: number | undefined;
-    memberSchemas: Schema[] | undefined;
     name: string | undefined;
-    nullable: boolean | undefined;
-    type: SchemaType | undefined;
-    id: string | undefined;
 
-    constructor(data?: ISchema) {
+    constructor(data?: IBangumiEditDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1582,70 +428,35 @@ export class Schema implements ISchema {
 
     init(data?: any) {
         if (data) {
-            this.alias = data["alias"];
-            this.arraySchema = data["arraySchema"] ? Schema.fromJS(data["arraySchema"]) : <any>undefined;
-            this.dictKeySchema = data["dictKeySchema"] ? Schema.fromJS(data["dictKeySchema"]) : <any>undefined;
-            this.dictValueSchema = data["dictValueSchema"] ? Schema.fromJS(data["dictValueSchema"]) : <any>undefined;
-            this.index = data["index"];
-            if (data["memberSchemas"] && data["memberSchemas"].constructor === Array) {
-                this.memberSchemas = [];
-                for (let item of data["memberSchemas"])
-                    this.memberSchemas.push(Schema.fromJS(item));
-            }
+            this.id = data["id"];
             this.name = data["name"];
-            this.nullable = data["nullable"];
-            this.type = data["type"];
-            this.id = data["id"];
         }
     }
 
-    static fromJS(data: any): Schema {
-        let result = new Schema();
+    static fromJS(data: any): BangumiEditDto {
+        let result = new BangumiEditDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["alias"] = this.alias;
-        data["arraySchema"] = this.arraySchema ? this.arraySchema.toJSON() : <any>undefined;
-        data["dictKeySchema"] = this.dictKeySchema ? this.dictKeySchema.toJSON() : <any>undefined;
-        data["dictValueSchema"] = this.dictValueSchema ? this.dictValueSchema.toJSON() : <any>undefined;
-        data["index"] = this.index;
-        if (this.memberSchemas && this.memberSchemas.constructor === Array) {
-            data["memberSchemas"] = [];
-            for (let item of this.memberSchemas)
-                data["memberSchemas"].push(item.toJSON());
-        }
-        data["name"] = this.name;
-        data["nullable"] = this.nullable;
-        data["type"] = this.type;
         data["id"] = this.id;
+        data["name"] = this.name;
         return data; 
     }
 }
 
-export interface ISchema {
-    alias: string | undefined;
-    arraySchema: Schema | undefined;
-    dictKeySchema: Schema | undefined;
-    dictValueSchema: Schema | undefined;
-    index: number | undefined;
-    memberSchemas: Schema[] | undefined;
-    name: string | undefined;
-    nullable: boolean | undefined;
-    type: SchemaType | undefined;
+export interface IBangumiEditDto {
     id: string | undefined;
+    name: string | undefined;
 }
 
-export class Source implements ISource {
-    name: string | undefined;
-    config: { [key: string] : any; } | undefined;
-    sourceType: SourceType | undefined;
-    direction: SourceDirection | undefined;
+export class BangumiDto implements IBangumiDto {
     id: string | undefined;
+    name: string | undefined;
 
-    constructor(data?: ISource) {
+    constructor(data?: IBangumiDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1656,59 +467,35 @@ export class Source implements ISource {
 
     init(data?: any) {
         if (data) {
+            this.id = data["id"];
             this.name = data["name"];
-            if (data["config"]) {
-                this.config = {};
-                for (let key in data["config"]) {
-                    if (data["config"].hasOwnProperty(key))
-                        this.config[key] = data["config"][key];
-                }
-            }
-            this.sourceType = data["sourceType"];
-            this.direction = data["direction"];
-            this.id = data["id"];
         }
     }
 
-    static fromJS(data: any): Source {
-        let result = new Source();
+    static fromJS(data: any): BangumiDto {
+        let result = new BangumiDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["name"] = this.name;
-        if (this.config) {
-            data["config"] = {};
-            for (let key in this.config) {
-                if (this.config.hasOwnProperty(key))
-                    data["config"][key] = this.config[key];
-            }
-        }
-        data["sourceType"] = this.sourceType;
-        data["direction"] = this.direction;
-        data["id"] = this.id;
         return data; 
     }
 }
 
-export interface ISource {
-    name: string | undefined;
-    config: { [key: string] : any; } | undefined;
-    sourceType: SourceType | undefined;
-    direction: SourceDirection | undefined;
+export interface IBangumiDto {
     id: string | undefined;
+    name: string | undefined;
 }
 
-export class Graph implements IGraph {
-    connections: Connection[] | undefined;
-    name: string | undefined;
-    nodes: Node[] | undefined;
-    schemas: string[] | undefined;
-    id: string | undefined;
+export class ImportBangumiDto implements IImportBangumiDto {
+    clear: boolean | undefined;
+    url: string | undefined;
 
-    constructor(data?: IGraph) {
+    constructor(data?: IImportBangumiDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1719,511 +506,75 @@ export class Graph implements IGraph {
 
     init(data?: any) {
         if (data) {
-            if (data["connections"] && data["connections"].constructor === Array) {
-                this.connections = [];
-                for (let item of data["connections"])
-                    this.connections.push(Connection.fromJS(item));
+            this.clear = data["clear"];
+            this.url = data["url"];
+        }
+    }
+
+    static fromJS(data: any): ImportBangumiDto {
+        let result = new ImportBangumiDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["clear"] = this.clear;
+        data["url"] = this.url;
+        return data; 
+    }
+}
+
+export interface IImportBangumiDto {
+    clear: boolean | undefined;
+    url: string | undefined;
+}
+
+export class Banner implements IBanner {
+    image: string | undefined;
+    link: string | undefined;
+    title: string | undefined;
+    id: string | undefined;
+
+    constructor(data?: IBanner) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
             }
-            this.name = data["name"];
-            if (data["nodes"] && data["nodes"].constructor === Array) {
-                this.nodes = [];
-                for (let item of data["nodes"])
-                    this.nodes.push(Node.fromJS(item));
-            }
-            if (data["schemas"] && data["schemas"].constructor === Array) {
-                this.schemas = [];
-                for (let item of data["schemas"])
-                    this.schemas.push(item);
-            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.image = data["image"];
+            this.link = data["link"];
+            this.title = data["title"];
             this.id = data["id"];
         }
     }
 
-    static fromJS(data: any): Graph {
-        let result = new Graph();
+    static fromJS(data: any): Banner {
+        let result = new Banner();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (this.connections && this.connections.constructor === Array) {
-            data["connections"] = [];
-            for (let item of this.connections)
-                data["connections"].push(item.toJSON());
-        }
-        data["name"] = this.name;
-        if (this.nodes && this.nodes.constructor === Array) {
-            data["nodes"] = [];
-            for (let item of this.nodes)
-                data["nodes"].push(item.toJSON());
-        }
-        if (this.schemas && this.schemas.constructor === Array) {
-            data["schemas"] = [];
-            for (let item of this.schemas)
-                data["schemas"].push(item);
-        }
+        data["image"] = this.image;
+        data["link"] = this.link;
+        data["title"] = this.title;
         data["id"] = this.id;
         return data; 
     }
 }
 
-export interface IGraph {
-    connections: Connection[] | undefined;
-    name: string | undefined;
-    nodes: Node[] | undefined;
-    schemas: string[] | undefined;
+export interface IBanner {
+    image: string | undefined;
+    link: string | undefined;
+    title: string | undefined;
     id: string | undefined;
-}
-
-export class Connection implements IConnection {
-    in: number | undefined;
-    out: number | undefined;
-
-    constructor(data?: IConnection) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.in = data["in"];
-            this.out = data["out"];
-        }
-    }
-
-    static fromJS(data: any): Connection {
-        let result = new Connection();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["in"] = this.in;
-        data["out"] = this.out;
-        return data; 
-    }
-}
-
-export interface IConnection {
-    in: number | undefined;
-    out: number | undefined;
-}
-
-export class Node implements INode {
-    id: number | undefined;
-    inSchema: string | undefined;
-    isAsync: boolean | undefined;
-    name: string | undefined;
-    outSchema: string | undefined;
-    params: any | undefined;
-    type: NodeType | undefined;
-
-    constructor(data?: INode) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.id = data["id"];
-            this.inSchema = data["inSchema"];
-            this.isAsync = data["isAsync"];
-            this.name = data["name"];
-            this.outSchema = data["outSchema"];
-            if (data["params"]) {
-                this.params = {};
-                for (let key in data["params"]) {
-                    if (data["params"].hasOwnProperty(key))
-                        this.params[key] = data["params"][key];
-                }
-            }
-            this.type = data["type"];
-        }
-    }
-
-    static fromJS(data: any): Node {
-        let result = new Node();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["inSchema"] = this.inSchema;
-        data["isAsync"] = this.isAsync;
-        data["name"] = this.name;
-        data["outSchema"] = this.outSchema;
-        if (this.params) {
-            data["params"] = {};
-            for (let key in this.params) {
-                if (this.params.hasOwnProperty(key))
-                    data["params"][key] = this.params[key];
-            }
-        }
-        data["type"] = this.type;
-        return data; 
-    }
-}
-
-export interface INode {
-    id: number | undefined;
-    inSchema: string | undefined;
-    isAsync: boolean | undefined;
-    name: string | undefined;
-    outSchema: string | undefined;
-    params: any | undefined;
-    type: NodeType | undefined;
-}
-
-export class GraphInstanceDto implements IGraphInstanceDto {
-    id: string | undefined;
-    graphName: string | undefined;
-    inputs: Input[] | undefined;
-    outputs: Output[] | undefined;
-    state: number | undefined;
-
-    constructor(data?: IGraphInstanceDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.id = data["id"];
-            this.graphName = data["graphName"];
-            if (data["inputs"] && data["inputs"].constructor === Array) {
-                this.inputs = [];
-                for (let item of data["inputs"])
-                    this.inputs.push(Input.fromJS(item));
-            }
-            if (data["outputs"] && data["outputs"].constructor === Array) {
-                this.outputs = [];
-                for (let item of data["outputs"])
-                    this.outputs.push(Output.fromJS(item));
-            }
-            this.state = data["state"];
-        }
-    }
-
-    static fromJS(data: any): GraphInstanceDto {
-        let result = new GraphInstanceDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["graphName"] = this.graphName;
-        if (this.inputs && this.inputs.constructor === Array) {
-            data["inputs"] = [];
-            for (let item of this.inputs)
-                data["inputs"].push(item.toJSON());
-        }
-        if (this.outputs && this.outputs.constructor === Array) {
-            data["outputs"] = [];
-            for (let item of this.outputs)
-                data["outputs"].push(item.toJSON());
-        }
-        data["state"] = this.state;
-        return data; 
-    }
-}
-
-export interface IGraphInstanceDto {
-    id: string | undefined;
-    graphName: string | undefined;
-    inputs: Input[] | undefined;
-    outputs: Output[] | undefined;
-    state: number | undefined;
-}
-
-export class Input implements IInput {
-    name: string | undefined;
-    id: string | undefined;
-
-    constructor(data?: IInput) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.name = data["name"];
-            this.id = data["id"];
-        }
-    }
-
-    static fromJS(data: any): Input {
-        let result = new Input();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["id"] = this.id;
-        return data; 
-    }
-}
-
-export interface IInput {
-    name: string | undefined;
-    id: string | undefined;
-}
-
-export class Output implements IOutput {
-    name: string | undefined;
-    id: string | undefined;
-
-    constructor(data?: IOutput) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.name = data["name"];
-            this.id = data["id"];
-        }
-    }
-
-    static fromJS(data: any): Output {
-        let result = new Output();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["id"] = this.id;
-        return data; 
-    }
-}
-
-export interface IOutput {
-    name: string | undefined;
-    id: string | undefined;
-}
-
-export class DropdownItem implements IDropdownItem {
-    name: string | undefined;
-    value: string | undefined;
-
-    constructor(data?: IDropdownItem) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.name = data["name"];
-            this.value = data["value"];
-        }
-    }
-
-    static fromJS(data: any): DropdownItem {
-        let result = new DropdownItem();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["value"] = this.value;
-        return data; 
-    }
-}
-
-export interface IDropdownItem {
-    name: string | undefined;
-    value: string | undefined;
-}
-
-export class SchemaCreateDto implements ISchemaCreateDto {
-    id: string | undefined;
-    config: string | undefined;
-
-    constructor(data?: ISchemaCreateDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.id = data["id"];
-            this.config = data["config"];
-        }
-    }
-
-    static fromJS(data: any): SchemaCreateDto {
-        let result = new SchemaCreateDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["config"] = this.config;
-        return data; 
-    }
-}
-
-export interface ISchemaCreateDto {
-    id: string | undefined;
-    config: string | undefined;
-}
-
-export class SourceDto implements ISourceDto {
-    name: string | undefined;
-    sourceType: number | undefined;
-    direction: number | undefined;
-    config: { [key: string] : any; } | undefined;
-    id: string | undefined;
-
-    constructor(data?: ISourceDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.name = data["name"];
-            this.sourceType = data["sourceType"];
-            this.direction = data["direction"];
-            if (data["config"]) {
-                this.config = {};
-                for (let key in data["config"]) {
-                    if (data["config"].hasOwnProperty(key))
-                        this.config[key] = data["config"][key];
-                }
-            }
-            this.id = data["id"];
-        }
-    }
-
-    static fromJS(data: any): SourceDto {
-        let result = new SourceDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["sourceType"] = this.sourceType;
-        data["direction"] = this.direction;
-        if (this.config) {
-            data["config"] = {};
-            for (let key in this.config) {
-                if (this.config.hasOwnProperty(key))
-                    data["config"][key] = this.config[key];
-            }
-        }
-        data["id"] = this.id;
-        return data; 
-    }
-}
-
-export interface ISourceDto {
-    name: string | undefined;
-    sourceType: number | undefined;
-    direction: number | undefined;
-    config: { [key: string] : any; } | undefined;
-    id: string | undefined;
-}
-
-export enum GraphInstanceState {
-    _0 = 0, 
-    _1 = 1, 
-}
-
-export enum SchemaType {
-    _0 = 0, 
-    _1 = 1, 
-    _2 = 2, 
-    _3 = 3, 
-    _4 = 4, 
-    _5 = 5, 
-    _6 = 6, 
-    _7 = 7, 
-    _8 = 8, 
-    _9 = 9, 
-    _10 = 10, 
-    _11 = 11, 
-    _12 = 12, 
-    _13 = 13, 
-    _14 = 14, 
-    _15 = 15, 
-    _16 = 16, 
-}
-
-export enum SourceType {
-    _0 = 0, 
-}
-
-export enum SourceDirection {
-    _0 = 0, 
-    _1 = 1, 
-}
-
-export enum NodeType {
-    _0 = 0, 
-    _1 = 1, 
-    _2 = 2, 
-    _3 = 3, 
-    _4 = 4, 
-    _5 = 5, 
-    _6 = 6, 
-    _7 = 7, 
-    _8 = 8, 
-    _9 = 9, 
-    _10 = 10, 
-    _11 = 11, 
-    _12 = 12, 
-    _13 = 13, 
-    _14 = 14, 
-    _15 = 15, 
-    _16 = 16, 
 }
 
 export class SwaggerException extends Error {

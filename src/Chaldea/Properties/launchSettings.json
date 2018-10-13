@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Chaldea": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "dev"
+      }
+    }
+  }
+}

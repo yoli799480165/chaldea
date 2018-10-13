@@ -1,0 +1,32 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="header">
+            <h4 class="title">动漫管理</h4>
+          </div>
+
+          <div>
+
+          </div>
+
+          <div class="content table-responsive table-full-width">
+            <div class="list-grid">
+              <div class="box">
+                <div class="box-item" *ngFor="let anime of animes" (click)="showDetail.emit(anime)">
+                  <div class="cover">
+                    <img [src]="coverUrl + anime.cover" alt="">
+                  </div>
+                  <div class="subtitle">
+                    {{anime.title}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

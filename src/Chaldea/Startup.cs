@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Chaldea.Repositories;
 using Chaldea.Seettings;
+using Chaldea.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +53,8 @@ namespace Chaldea
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
             services.AddTransient<ChaldeaDbContext>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
+
+            Mappings.Initialize();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

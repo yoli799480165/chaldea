@@ -3,11 +3,7 @@ import * as ApiServiceProxies from './service-proxies';
 
 @NgModule({
   providers: [
-    ApiServiceProxies.GraphinstanceServiceProxy,
-    ApiServiceProxies.GraphServiceProxy,
-    ApiServiceProxies.ConsumerServiceProxy,
-    ApiServiceProxies.SchemaServiceProxy,
-    ApiServiceProxies.SourceServiceProxy,
+    ApiServiceProxies.BangumiServiceProxy,
   ],
 })
 export class ServiceProxyModule {
