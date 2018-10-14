@@ -30,6 +30,8 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { BangumiComponent } from './bangumi/bangumi.component';
 import { BangumiEditComponent } from './bangumi/bangumi-edit/bangumi-edit.component';
 import { AnimeComponent } from './anime/anime.component';
+import { AnimeImportComponent } from './anime/anime-import/anime-import.component';
+import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
 
 export function getRemoteServiceBaseUrl(): string {
   return AppConsts.appBaseUrl;
@@ -49,7 +51,9 @@ export function getRemoteServiceBaseUrl(): string {
     DictionaryPipe,
     BangumiComponent,
     BangumiEditComponent,
-    AnimeComponent
+    AnimeComponent,
+    AnimeImportComponent,
+    AnimeDetailComponent
   ],
   imports: [
     NgxCoolDialogsModule.forRoot(),
@@ -73,7 +77,8 @@ export function getRemoteServiceBaseUrl(): string {
   ],
   bootstrap: [AppComponent],
   entryComponents: [
-    BangumiEditComponent
+    BangumiEditComponent,
+    AnimeImportComponent
   ]
 })
 export class AppModule { }

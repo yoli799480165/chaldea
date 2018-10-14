@@ -7,11 +7,13 @@ import { NotificationsComponent } from './notifications/notifications.component'
 import { UpgradeComponent } from './upgrade/upgrade.component';
 import { BangumiComponent } from './bangumi/bangumi.component';
 import { AnimeComponent } from './anime/anime.component';
+import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: HomeComponent },
   { path: 'bangumi', component: BangumiComponent },
   { path: 'anime', component: AnimeComponent },
+  { path: 'anime-detail/:animeId', component: AnimeDetailComponent },
   { path: 'notifications', component: NotificationsComponent },
   { path: 'upgrade', component: UpgradeComponent },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' }

@@ -17,16 +17,19 @@ namespace Chaldea.Services.Bangumis
     [Route("api/bangumi")]
     public class BangumiService : ServiceBase
     {
+        private readonly IRepository<string, Anime> _animeRepository;
         private readonly IRepository<string, Bangumi> _bangumiRepository;
         private readonly ILogger<BangumiService> _logger;
 
         public BangumiService(
             ILogger<BangumiService> logger,
-            IRepository<string, Bangumi> bangumiRepository
+            IRepository<string, Bangumi> bangumiRepository,
+            IRepository<string, Anime> animeRepository
         )
         {
             _logger = logger;
             _bangumiRepository = bangumiRepository;
+            _animeRepository = animeRepository;
         }
 
         [Route("createOrUpdate")]
@@ -45,7 +48,7 @@ namespace Chaldea.Services.Bangumis
                 {
                     var bangumi = Mapper.Map<Bangumi>(input);
                     bangumi.Id = Guid.NewGuid().ToString("N");
-                    bangumi.Animes = new List<Anime>();
+                    bangumi.Animes = new List<string>();
                     await _bangumiRepository.AddAsync(bangumi);
                 }
                 else
@@ -103,24 +106,30 @@ namespace Chaldea.Services.Bangumis
         {
             try
             {
-                var projectionInclude = Builders<Bangumi>.Projection.Include("animes._id").Include("animes.title")
-                    .Include("animes.cover");
-                var projectionSlice = Builders<Bangumi>.Projection.Slice(x => x.Animes, 0, slice);
-                var projection = _bangumiRepository.GetAll().SortByDescending(x => x.Name)
-                    .Project<Bangumi>(projectionInclude);
-                if (slice > 0) projection = projection.Project<Bangumi>(projectionSlice);
+                var stages = new List<string>
+                {
+                    "{$lookup:{localField:'animes',from:'animes',foreignField:'_id',as:'animes'}}",
+                    "{$project:{'_id':1,'name':1,'animes._id':1,'animes.title':1,'animes.cover':1}}"
+                };
 
-                if (skip > 0 && take > 0) projection = projection.Skip(skip).Limit(take);
+                if (slice > 0) stages.Add("{$project:{'_id':1,'name':1,animes:{$slice:['$animes'," + slice + "]}}}");
 
-                var list = await projection.ToListAsync();
-                return Mapper.Map<ICollection<BangumiAnimesDto>>(list);
+                if (skip >= 0 && take > 0)
+                {
+                    stages.Add("{$skip: " + skip + "}");
+                    stages.Add("{$limit: " + take + "}");
+                }
+
+                var pipeline = PipelineDefinition<Bangumi, BangumiAnimesDto>.Create(stages);
+
+                var list = await _bangumiRepository.Aggregate(pipeline).ToListAsync();
+                return list;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
                 throw new UserFriendlyException("Get bangumi animes failed.");
             }
-            
         }
 
         [Route("{id}/import")]
@@ -136,6 +145,8 @@ namespace Chaldea.Services.Bangumis
             if (string.IsNullOrEmpty(input.Url))
                 throw new UserFriendlyException($"Invalid parameter {nameof(input.Url)}");
 
+            _logger.LogInformation($"Begin to import, begin date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+
             var imgPath = Path.Combine(Directory.GetCurrentDirectory(), "statics", "imgs");
             if (!Directory.Exists(imgPath))
                 Directory.CreateDirectory(imgPath);
@@ -144,9 +155,10 @@ namespace Chaldea.Services.Bangumis
             if (bangumi == null)
                 throw new Exception($"Can not find bangumi: {id}");
 
-            if (bangumi.Animes == null) bangumi.Animes = new List<Anime>();
+            if (bangumi.Animes == null) bangumi.Animes = new List<string>();
             if (input.Clear) bangumi.Animes.Clear();
 
+            var animeList = new List<Anime>();
             var webClient = new WebClient();
             var web = new HtmlWeb();
             var baseUrl = new Uri(input.Url).GetLeftPart(UriPartial.Authority);
@@ -158,6 +170,8 @@ namespace Chaldea.Services.Bangumis
                 var href = animeListNode.ParentNode.Attributes["href"].Value;
                 animeDetailUrls.TryAdd(href, $"{baseUrl}{href}");
             }
+
+            _logger.LogInformation($"Find {animeDetailUrls.Count} resources in total.");
 
             foreach (var animeDetailUrl in animeDetailUrls)
             {
@@ -198,12 +212,17 @@ namespace Chaldea.Services.Bangumis
                     Cover = imgName,
                     Desc = desc
                 };
-                bangumi.Animes.Add(anime);
+                animeList.Add(anime);
+                bangumi.Animes.Add(anime.Id);
+                _logger.LogInformation($"Add anime {anime.Id} to list.");
             }
 
             var filter = Builders<Bangumi>.Filter.Eq("_id", id);
             var update = Builders<Bangumi>.Update.Set("animes", bangumi.Animes);
             await _bangumiRepository.UpdateAsync(filter, update);
+            await _animeRepository.AddManyAsync(animeList);
+            _logger.LogInformation(
+                $"Import {animeList.Count} animes successfully at {DateTime.Now:yyyy-MM-dd HH:mm:ss}.");
         }
     }
 }

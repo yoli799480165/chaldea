@@ -1,0 +1,83 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="content">
+            <div class="list-detail">
+              <div class="anime">
+                <div class="cover">
+                  <img [src]="coverUrl + anime.cover" alt="">
+                </div>
+                <div class="info">
+                  <h4>{{anime.title}}</h4>
+                  <div class="desc">
+                    <p>{{anime.desc}}</p>
+                  </div>
+                  <div class="episode-title">
+                    剧集：
+                  </div>
+                  <div class="episode">
+                    <a class="item" *ngFor="let source of anime.animes">{{source}}</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="title">标签</div>
+                <div class="tag">
+                  <a *ngFor="let type of animeTag.types" (click)="anime.type = type" [ngClass]="{'selected': type==anime.type}">{{type}}</a>
+                </div>
+                <div class="tag">
+                  <a *ngFor="let tag of animeTag.tags" (click)="selectTag(tag)" [ngClass]="{'selected': anime.tags.indexOf(tag)>-1}">{{tag}}</a>
+                </div>
+                <div class="tag">
+                  <a *ngFor="let state of animeTag.states" (click)="anime.state = state" [ngClass]="{'selected': state==anime.state}">{{state}}</a>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="title">标题</div>
+                <div>
+                  <input class="ani-title" type="text" placeholder="请输入标题" [(ngModel)]="anime.title">
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="title">作者</div>
+                <div>
+                  <input class="ani-title" type="text" placeholder="请输入作者" [(ngModel)]="anime.auth">
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="title">监督</div>
+                <div>
+                  <input class="ani-title" type="text" placeholder="请输入监督" [(ngModel)]="anime.director">
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="title">出版商</div>
+                <div>
+                  <input class="ani-title" type="text" placeholder="请输入出版商" [(ngModel)]="anime.publisher">
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="title">简介</div>
+                <div>
+                  <textarea class="ani-desc" rows="5" placeholder="请输入简介" [(ngModel)]="anime.desc"></textarea>
+                </div>
+              </div>
+
+              <div class="section footer">
+                <button (click)="save()">保存</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

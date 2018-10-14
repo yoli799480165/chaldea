@@ -1,5 +1,8 @@
+.tool-bar {
+    padding-right: 25px;
+}
+
 .list-grid {
-    margin: 20px 0px;
     display: flex;
     .box {
         display: flex;
@@ -22,6 +25,7 @@
             }
             .subtitle {
                 line-height: 20px;
+                font-size: 12px;
             }
         }
     }

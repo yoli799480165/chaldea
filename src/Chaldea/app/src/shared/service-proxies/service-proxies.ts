@@ -23,6 +23,242 @@ import * as moment from 'moment';
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 @Injectable()
+export class AnimeServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @bangumiId (optional) 
+     * @skip (optional) 
+     * @take (optional) 
+     * @return Success
+     */
+    getList(bangumiId: string | null, skip: number | null, take: number | null): Observable<AnimeOutlineDto[]> {
+        let url_ = this.baseUrl + "/api/anime/getList?";
+        if (bangumiId !== undefined)
+            url_ += "bangumiId=" + encodeURIComponent("" + bangumiId) + "&"; 
+        if (skip !== undefined)
+            url_ += "skip=" + encodeURIComponent("" + skip) + "&"; 
+        if (take !== undefined)
+            url_ += "take=" + encodeURIComponent("" + take) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetList(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetList(response_);
+                } catch (e) {
+                    return <Observable<AnimeOutlineDto[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<AnimeOutlineDto[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetList(response: HttpResponse<Blob>): Observable<AnimeOutlineDto[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(AnimeOutlineDto.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<AnimeOutlineDto[]>(<any>null);
+    }
+
+    /**
+     * @animeId (optional) 
+     * @return Success
+     */
+    getAnime(animeId: string | null): Observable<AnimeDto> {
+        let url_ = this.baseUrl + "/api/anime/getAnime?";
+        if (animeId !== undefined)
+            url_ += "animeId=" + encodeURIComponent("" + animeId) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetAnime(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetAnime(response_);
+                } catch (e) {
+                    return <Observable<AnimeDto>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<AnimeDto>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetAnime(response: HttpResponse<Blob>): Observable<AnimeDto> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? AnimeDto.fromJS(resultData200) : new AnimeDto();
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<AnimeDto>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    update(input: AnimeDto | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/anime/update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processUpdate(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processUpdate(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processUpdate(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+}
+
+@Injectable()
+export class AnimeTagServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getTags(): Observable<AnimeTagDto> {
+        let url_ = this.baseUrl + "/api/animeTag/getTags";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetTags(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetTags(response_);
+                } catch (e) {
+                    return <Observable<AnimeTagDto>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<AnimeTagDto>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetTags(response: HttpResponse<Blob>): Observable<AnimeTagDto> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? AnimeTagDto.fromJS(resultData200) : new AnimeTagDto();
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<AnimeTagDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class BangumiServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -181,6 +417,68 @@ export class BangumiServiceProxy {
             });
         }
         return Observable.of<BangumiDto[]>(<any>null);
+    }
+
+    /**
+     * @skip (optional) 
+     * @take (optional) 
+     * @slice (optional) 
+     * @return Success
+     */
+    getAnimes(skip: number | null, take: number | null, slice: number | null): Observable<BangumiAnimesDto[]> {
+        let url_ = this.baseUrl + "/api/bangumi/getAnimes?";
+        if (skip !== undefined)
+            url_ += "skip=" + encodeURIComponent("" + skip) + "&"; 
+        if (take !== undefined)
+            url_ += "take=" + encodeURIComponent("" + take) + "&"; 
+        if (slice !== undefined)
+            url_ += "slice=" + encodeURIComponent("" + slice) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetAnimes(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetAnimes(response_);
+                } catch (e) {
+                    return <Observable<BangumiAnimesDto[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<BangumiAnimesDto[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetAnimes(response: HttpResponse<Blob>): Observable<BangumiAnimesDto[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(BangumiAnimesDto.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<BangumiAnimesDto[]>(<any>null);
     }
 
     /**
@@ -357,6 +655,63 @@ export class BannerServiceProxy {
 }
 
 @Injectable()
+export class MigrateServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    migrateAnimeTags(): Observable<void> {
+        let url_ = this.baseUrl + "/api/migrate/migrateAnimeTags";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processMigrateAnimeTags(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processMigrateAnimeTags(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processMigrateAnimeTags(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+}
+
+@Injectable()
 export class UserServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -411,6 +766,255 @@ export class UserServiceProxy {
         }
         return Observable.of<void>(<any>null);
     }
+}
+
+export class AnimeOutlineDto implements IAnimeOutlineDto {
+    id: string | undefined;
+    title: string | undefined;
+    cover: string | undefined;
+
+    constructor(data?: IAnimeOutlineDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.title = data["title"];
+            this.cover = data["cover"];
+        }
+    }
+
+    static fromJS(data: any): AnimeOutlineDto {
+        let result = new AnimeOutlineDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["cover"] = this.cover;
+        return data; 
+    }
+}
+
+export interface IAnimeOutlineDto {
+    id: string | undefined;
+    title: string | undefined;
+    cover: string | undefined;
+}
+
+export class AnimeDto implements IAnimeDto {
+    id: string | undefined;
+    title: string | undefined;
+    cover: string | undefined;
+    playCounts: number | undefined;
+    subCounts: number | undefined;
+    desc: string | undefined;
+    auth: string | undefined;
+    publisher: string | undefined;
+    director: string | undefined;
+    state: string | undefined;
+    type: string | undefined;
+    level: number | undefined;
+    tags: string[] | undefined;
+    videos: string[] | undefined;
+    comics: string[] | undefined;
+    novels: string[] | undefined;
+    comments: string[] | undefined;
+
+    constructor(data?: IAnimeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.title = data["title"];
+            this.cover = data["cover"];
+            this.playCounts = data["playCounts"];
+            this.subCounts = data["subCounts"];
+            this.desc = data["desc"];
+            this.auth = data["auth"];
+            this.publisher = data["publisher"];
+            this.director = data["director"];
+            this.state = data["state"];
+            this.type = data["type"];
+            this.level = data["level"];
+            if (data["tags"] && data["tags"].constructor === Array) {
+                this.tags = [];
+                for (let item of data["tags"])
+                    this.tags.push(item);
+            }
+            if (data["videos"] && data["videos"].constructor === Array) {
+                this.videos = [];
+                for (let item of data["videos"])
+                    this.videos.push(item);
+            }
+            if (data["comics"] && data["comics"].constructor === Array) {
+                this.comics = [];
+                for (let item of data["comics"])
+                    this.comics.push(item);
+            }
+            if (data["novels"] && data["novels"].constructor === Array) {
+                this.novels = [];
+                for (let item of data["novels"])
+                    this.novels.push(item);
+            }
+            if (data["comments"] && data["comments"].constructor === Array) {
+                this.comments = [];
+                for (let item of data["comments"])
+                    this.comments.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AnimeDto {
+        let result = new AnimeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["cover"] = this.cover;
+        data["playCounts"] = this.playCounts;
+        data["subCounts"] = this.subCounts;
+        data["desc"] = this.desc;
+        data["auth"] = this.auth;
+        data["publisher"] = this.publisher;
+        data["director"] = this.director;
+        data["state"] = this.state;
+        data["type"] = this.type;
+        data["level"] = this.level;
+        if (this.tags && this.tags.constructor === Array) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        if (this.videos && this.videos.constructor === Array) {
+            data["videos"] = [];
+            for (let item of this.videos)
+                data["videos"].push(item);
+        }
+        if (this.comics && this.comics.constructor === Array) {
+            data["comics"] = [];
+            for (let item of this.comics)
+                data["comics"].push(item);
+        }
+        if (this.novels && this.novels.constructor === Array) {
+            data["novels"] = [];
+            for (let item of this.novels)
+                data["novels"].push(item);
+        }
+        if (this.comments && this.comments.constructor === Array) {
+            data["comments"] = [];
+            for (let item of this.comments)
+                data["comments"].push(item);
+        }
+        return data; 
+    }
+}
+
+export interface IAnimeDto {
+    id: string | undefined;
+    title: string | undefined;
+    cover: string | undefined;
+    playCounts: number | undefined;
+    subCounts: number | undefined;
+    desc: string | undefined;
+    auth: string | undefined;
+    publisher: string | undefined;
+    director: string | undefined;
+    state: string | undefined;
+    type: string | undefined;
+    level: number | undefined;
+    tags: string[] | undefined;
+    videos: string[] | undefined;
+    comics: string[] | undefined;
+    novels: string[] | undefined;
+    comments: string[] | undefined;
+}
+
+export class AnimeTagDto implements IAnimeTagDto {
+    types: string[] | undefined;
+    tags: string[] | undefined;
+    states: string[] | undefined;
+
+    constructor(data?: IAnimeTagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            if (data["types"] && data["types"].constructor === Array) {
+                this.types = [];
+                for (let item of data["types"])
+                    this.types.push(item);
+            }
+            if (data["tags"] && data["tags"].constructor === Array) {
+                this.tags = [];
+                for (let item of data["tags"])
+                    this.tags.push(item);
+            }
+            if (data["states"] && data["states"].constructor === Array) {
+                this.states = [];
+                for (let item of data["states"])
+                    this.states.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AnimeTagDto {
+        let result = new AnimeTagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.types && this.types.constructor === Array) {
+            data["types"] = [];
+            for (let item of this.types)
+                data["types"].push(item);
+        }
+        if (this.tags && this.tags.constructor === Array) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        if (this.states && this.states.constructor === Array) {
+            data["states"] = [];
+            for (let item of this.states)
+                data["states"].push(item);
+        }
+        return data; 
+    }
+}
+
+export interface IAnimeTagDto {
+    types: string[] | undefined;
+    tags: string[] | undefined;
+    states: string[] | undefined;
 }
 
 export class BangumiEditDto implements IBangumiEditDto {
@@ -489,6 +1093,57 @@ export class BangumiDto implements IBangumiDto {
 export interface IBangumiDto {
     id: string | undefined;
     name: string | undefined;
+}
+
+export class BangumiAnimesDto implements IBangumiAnimesDto {
+    id: string | undefined;
+    name: string | undefined;
+    animes: AnimeOutlineDto[] | undefined;
+
+    constructor(data?: IBangumiAnimesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.name = data["name"];
+            if (data["animes"] && data["animes"].constructor === Array) {
+                this.animes = [];
+                for (let item of data["animes"])
+                    this.animes.push(AnimeOutlineDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): BangumiAnimesDto {
+        let result = new BangumiAnimesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (this.animes && this.animes.constructor === Array) {
+            data["animes"] = [];
+            for (let item of this.animes)
+                data["animes"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IBangumiAnimesDto {
+    id: string | undefined;
+    name: string | undefined;
+    animes: AnimeOutlineDto[] | undefined;
 }
 
 export class ImportBangumiDto implements IImportBangumiDto {

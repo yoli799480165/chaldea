@@ -2,6 +2,7 @@
 using Chaldea.Repositories;
 using Chaldea.Seettings;
 using Chaldea.Services;
+using Chaldea.Services.Nodes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,7 @@ namespace Chaldea
                         .AllowCredentials();
                 });
             });
+            services.AddSignalR();
             services.AddMvcCore()
                 .AddAuthorization()
                 .AddJsonFormatters()
@@ -51,8 +53,12 @@ namespace Chaldea
                     options.ApiName = "api1";
                 });
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
+
+            services.AddSingleton<EventManager>();
+            services.AddSingleton<NodeManager>();
             services.AddTransient<ChaldeaDbContext>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
+            services.AddScoped<NodeProxy>();
 
             Mappings.Initialize();
         }
@@ -64,14 +70,13 @@ namespace Chaldea
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Open API V1"); });
             app.UseCors(DefaultCorsPolicyName);
-            // app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "statics")),
                 RequestPath = "/statics"
             });
-
+            app.UseSignalR(route => { route.MapHub<NodeHub>("/node"); });
             app.UseMvc();
         }
     }
