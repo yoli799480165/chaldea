@@ -32,6 +32,8 @@ import { BangumiEditComponent } from './bangumi/bangumi-edit/bangumi-edit.compon
 import { AnimeComponent } from './anime/anime.component';
 import { AnimeImportComponent } from './anime/anime-import/anime-import.component';
 import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
+import { NodeComponent } from './node/node.component';
+import { NodeResourceComponent } from './node/node-resource/node-resource.component';
 
 export function getRemoteServiceBaseUrl(): string {
   return AppConsts.appBaseUrl;
@@ -53,7 +55,9 @@ export function getRemoteServiceBaseUrl(): string {
     BangumiEditComponent,
     AnimeComponent,
     AnimeImportComponent,
-    AnimeDetailComponent
+    AnimeDetailComponent,
+    NodeComponent,
+    NodeResourceComponent
   ],
   imports: [
     NgxCoolDialogsModule.forRoot(),

@@ -30,6 +30,7 @@
         "core-js": "^2.4.1",
         "jquery": "^3.2.1",
         "moment": "^2.22.2",
+        "ng2-tree": "^2.0.0-rc.11",
         "ngx-bootstrap": "^3.0.1",
         "ngx-cool-dialogs": "^0.1.3",
         "rxjs": "^5.5.2",

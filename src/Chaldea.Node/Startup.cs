@@ -20,6 +20,7 @@ namespace Chaldea.Node
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<Appsettings>(Configuration.GetSection("Appsettings"));
+            services.Configure<BaiduDiskSettings>(Configuration.GetSection("BaiduDisk"));
             services.AddMvcCore()
                 .AddJsonFormatters()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)

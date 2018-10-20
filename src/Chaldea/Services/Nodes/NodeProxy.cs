@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Chaldea.Core.Nodes;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
@@ -24,24 +25,34 @@ namespace Chaldea.Services.Nodes
             _nodeManager = nodeManager;
         }
 
-        public async Task<List<string>> GetRootDirs(string nodeId)
-        {
-            (Guid eventId, Subject<object> subject) result = _eventManager.Create();
-            var connectionId = _nodeManager.GetConnectionId(nodeId);
-            if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
-            await _hubContext.Clients.Client(connectionId).SendAsync("getRootDirs", result.eventId);
-            var data = await result.subject.GetAwaiter();
-            return data as List<string>;
-        }
-
-        public async Task<List<string>> GetDirFiles(string nodeId, string path)
+        public async Task<List<DirFileInfo>> GetDirFiles(string nodeId, string path)
         {
             (Guid eventId, Subject<object> subject) result = _eventManager.Create();
             var connectionId = _nodeManager.GetConnectionId(nodeId);
             if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
             await _hubContext.Clients.Client(connectionId).SendAsync("getDirFiles", result.eventId, path);
             var data = await result.subject.GetAwaiter();
-            return data as List<string>;
+            return data as List<DirFileInfo>;
+        }
+
+        public async Task<string> DeleteDirFiles(string nodeId, ICollection<DirFileInfo> dirFiles)
+        {
+            (Guid eventId, Subject<object> subject) result = _eventManager.Create();
+            var connectionId = _nodeManager.GetConnectionId(nodeId);
+            if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
+            await _hubContext.Clients.Client(connectionId).SendAsync("deleteDirFiles", result.eventId, dirFiles);
+            var data = await result.subject.GetAwaiter();
+            return data as string;
+        }
+
+        public async Task<string> ExtractFiles(string nodeId, ExtractFileInfo extractFileInfo)
+        {
+            (Guid eventId, Subject<object> subject) result = _eventManager.Create();
+            var connectionId = _nodeManager.GetConnectionId(nodeId);
+            if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
+            await _hubContext.Clients.Client(connectionId).SendAsync("extractFiles", result.eventId, extractFileInfo);
+            var data = await result.subject.GetAwaiter();
+            return data as string;
         }
     }
 

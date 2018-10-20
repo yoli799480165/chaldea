@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Chaldea.Core.Nodes;
 using Chaldea.Repositories;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -48,21 +49,30 @@ namespace Chaldea.Services.Nodes
             return base.OnDisconnectedAsync(exception);
         }
 
-        public Task GetRootDirsResponse(Guid eventId, List<string> data)
-        {
-            var httpContext = Context.GetHttpContext();
-            var id = httpContext.Request.Query["nodeId"];
-            _logger.LogInformation($"Node {id} call method: {nameof(GetRootDirsResponse)}");
-            _eventManager.Emit(eventId, data);
-            return Task.CompletedTask;
-        }
-
-        public Task GetDirFilesResponse(Guid eventId, List<string> data)
+        public Task GetDirFilesResponse(Guid eventId, List<DirFileInfo> data)
         {
             var httpContext = Context.GetHttpContext();
             var id = httpContext.Request.Query["nodeId"];
             _logger.LogInformation($"Node {id} call method: {nameof(GetDirFilesResponse)}");
             _eventManager.Emit(eventId, data);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteDirFilesResponse(Guid eventId, string msg)
+        {
+            var httpContext = Context.GetHttpContext();
+            var id = httpContext.Request.Query["nodeId"];
+            _logger.LogInformation($"Node {id} call method: {nameof(DeleteDirFilesResponse)}");
+            _eventManager.Emit(eventId, msg);
+            return Task.CompletedTask;
+        }
+
+        public Task ExtractFilesResponse(Guid eventId, string msg)
+        {
+            var httpContext = Context.GetHttpContext();
+            var id = httpContext.Request.Query["nodeId"];
+            _logger.LogInformation($"Node {id} call method: {nameof(ExtractFilesResponse)}");
+            _eventManager.Emit(eventId, msg);
             return Task.CompletedTask;
         }
     }

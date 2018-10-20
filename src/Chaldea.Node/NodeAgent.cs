@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Chaldea.Core.Nodes;
 using Chaldea.Node.Configuration;
 using Chaldea.Node.Services;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -20,17 +22,24 @@ namespace Chaldea.Node
                 .WithUrl($"{options.Value.NodeServer}/node?nodeId={GetId()}")
                 .Build();
 
-            Connection.On<Guid>("getRootDirs", async eventId =>
-            {
-                var rootDirs = directoryService.GetRootDirs();
-                await Connection.InvokeAsync("getRootDirsResponse", eventId, rootDirs);
-            });
-
             Connection.On<Guid, string>("getDirFiles", async (eventId, path) =>
             {
                 var rootDirs = directoryService.GetDirFiles(path);
                 await Connection.InvokeAsync("getDirFilesResponse", eventId, rootDirs);
             });
+
+            Connection.On<Guid, ICollection<DirFileInfo>>("deleteDirFiles", async (eventId, dirFiles) =>
+            {
+                var msg = directoryService.DeleteDirFiles(dirFiles);
+                await Connection.InvokeAsync("deleteDirFilesResponse", eventId, msg);
+            });
+
+            Connection.On<Guid, ExtractFileInfo>("extractFiles",
+                async (eventId, extractFileInfo) =>
+                {
+                    var msg = directoryService.ExtractFiles(extractFileInfo);
+                    await Connection.InvokeAsync("extractFilesResponse", eventId, msg);
+                });
         }
 
         public HubConnection Connection { get; set; }

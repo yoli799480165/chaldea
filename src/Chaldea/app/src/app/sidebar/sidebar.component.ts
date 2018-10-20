@@ -11,7 +11,7 @@ export const ROUTES: RouteInfo[] = [
     { path: 'dashboard', title: 'Dashboard', icon: 'pe-7s-home', class: '' },
     { path: 'bangumi', title: '番组管理', icon: 'pe-7s-science', class: '' },
     { path: 'anime', title: '动漫管理', icon: 'pe-7s-display1', class: '' },
-    { path: 'icons', title: '资源管理', icon: 'pe-7s-video', class: '' },
+    { path: 'node-resource', title: '资源管理', icon: 'pe-7s-video', class: '' },
     { path: 'icons', title: '消息管理', icon: 'pe-7s-chat', class: '' },
     { path: 'icons', title: '评论管理', icon: 'pe-7s-paper-plane', class: '' },
     { path: 'icons', title: '成就管理', icon: 'pe-7s-medal', class: '' },

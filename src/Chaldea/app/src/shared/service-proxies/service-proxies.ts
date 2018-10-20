@@ -712,6 +712,243 @@ export class MigrateServiceProxy {
 }
 
 @Injectable()
+export class NodeServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getNodes(): Observable<Node[]> {
+        let url_ = this.baseUrl + "/api/node/getNodes";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetNodes(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetNodes(response_);
+                } catch (e) {
+                    return <Observable<Node[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<Node[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetNodes(response: HttpResponse<Blob>): Observable<Node[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(Node.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<Node[]>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    getDirFiles(nodeId: string, input: GetDirFileDto | null): Observable<DirFileInfo[]> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/getDirFiles";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processGetDirFiles(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetDirFiles(response_);
+                } catch (e) {
+                    return <Observable<DirFileInfo[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<DirFileInfo[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetDirFiles(response: HttpResponse<Blob>): Observable<DirFileInfo[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(DirFileInfo.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<DirFileInfo[]>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    deleteDirFiles(nodeId: string, input: DirFileInfo[] | null): Observable<string> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/deleteDirFiles";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
+            return this.processDeleteDirFiles(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processDeleteDirFiles(response_);
+                } catch (e) {
+                    return <Observable<string>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<string>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processDeleteDirFiles(response: HttpResponse<Blob>): Observable<string> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<string>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    extractFiles(nodeId: string, input: ExtractFileDto | null): Observable<string> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/extractFiles";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
+            return this.processExtractFiles(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processExtractFiles(response_);
+                } catch (e) {
+                    return <Observable<string>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<string>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processExtractFiles(response: HttpResponse<Blob>): Observable<string> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<string>(<any>null);
+    }
+}
+
+@Injectable()
 export class UserServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -1230,6 +1467,208 @@ export interface IBanner {
     link: string | undefined;
     title: string | undefined;
     id: string | undefined;
+}
+
+export class Node implements INode {
+    name: string | undefined;
+    osType: string | undefined;
+    ip: string | undefined;
+    state: NodeState | undefined;
+    connectionId: string | undefined;
+    id: string | undefined;
+
+    constructor(data?: INode) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.name = data["name"];
+            this.osType = data["osType"];
+            this.ip = data["ip"];
+            this.state = data["state"];
+            this.connectionId = data["connectionId"];
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): Node {
+        let result = new Node();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["osType"] = this.osType;
+        data["ip"] = this.ip;
+        data["state"] = this.state;
+        data["connectionId"] = this.connectionId;
+        data["id"] = this.id;
+        return data; 
+    }
+}
+
+export interface INode {
+    name: string | undefined;
+    osType: string | undefined;
+    ip: string | undefined;
+    state: NodeState | undefined;
+    connectionId: string | undefined;
+    id: string | undefined;
+}
+
+export class GetDirFileDto implements IGetDirFileDto {
+    path: string | undefined;
+
+    constructor(data?: IGetDirFileDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.path = data["path"];
+        }
+    }
+
+    static fromJS(data: any): GetDirFileDto {
+        let result = new GetDirFileDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["path"] = this.path;
+        return data; 
+    }
+}
+
+export interface IGetDirFileDto {
+    path: string | undefined;
+}
+
+export class DirFileInfo implements IDirFileInfo {
+    type: DirFileInfoType | undefined;
+    name: string | undefined;
+    fullName: string | undefined;
+    modifyTime: moment.Moment | undefined;
+    length: number | undefined;
+
+    constructor(data?: IDirFileInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.type = data["type"];
+            this.name = data["name"];
+            this.fullName = data["fullName"];
+            this.modifyTime = data["modifyTime"] ? moment(data["modifyTime"].toString()) : <any>undefined;
+            this.length = data["length"];
+        }
+    }
+
+    static fromJS(data: any): DirFileInfo {
+        let result = new DirFileInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["type"] = this.type;
+        data["name"] = this.name;
+        data["fullName"] = this.fullName;
+        data["modifyTime"] = this.modifyTime ? this.modifyTime.toISOString() : <any>undefined;
+        data["length"] = this.length;
+        return data; 
+    }
+}
+
+export interface IDirFileInfo {
+    type: DirFileInfoType | undefined;
+    name: string | undefined;
+    fullName: string | undefined;
+    modifyTime: moment.Moment | undefined;
+    length: number | undefined;
+}
+
+export class ExtractFileDto implements IExtractFileDto {
+    files: DirFileInfo[] | undefined;
+    destDir: string | undefined;
+    password: string | undefined;
+
+    constructor(data?: IExtractFileDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            if (data["files"] && data["files"].constructor === Array) {
+                this.files = [];
+                for (let item of data["files"])
+                    this.files.push(DirFileInfo.fromJS(item));
+            }
+            this.destDir = data["destDir"];
+            this.password = data["password"];
+        }
+    }
+
+    static fromJS(data: any): ExtractFileDto {
+        let result = new ExtractFileDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.files && this.files.constructor === Array) {
+            data["files"] = [];
+            for (let item of this.files)
+                data["files"].push(item.toJSON());
+        }
+        data["destDir"] = this.destDir;
+        data["password"] = this.password;
+        return data; 
+    }
+}
+
+export interface IExtractFileDto {
+    files: DirFileInfo[] | undefined;
+    destDir: string | undefined;
+    password: string | undefined;
+}
+
+export enum NodeState {
+    _0 = 0, 
+    _1 = 1, 
+}
+
+export enum DirFileInfoType {
+    _0 = 0, 
+    _1 = 1, 
 }
 
 export class SwaggerException extends Error {
