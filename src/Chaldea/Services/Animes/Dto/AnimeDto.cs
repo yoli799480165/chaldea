@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Chaldea.Repositories;
 
 namespace Chaldea.Services.Animes.Dto
 {
@@ -30,11 +31,11 @@ namespace Chaldea.Services.Animes.Dto
 
         public List<string> Tags { get; set; }
 
-        public List<string> Videos { get; set; }
+        public List<Resource> Videos { get; set; }
 
-        public List<string> Comics { get; set; }
+        public List<Resource> Comics { get; set; }
 
-        public List<string> Novels { get; set; }
+        public List<Resource> Novels { get; set; }
 
         public List<string> Comments { get; set; }
     }

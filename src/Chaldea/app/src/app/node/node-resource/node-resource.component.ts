@@ -87,7 +87,7 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
   goto(current: string): void {
     const index = this.pathList.indexOf(current) + 1;
     const fullPathList = this.pathList.slice(0, index);
-    const fullPath = fullPathList.length === 1 ? `${fullPathList[0]}/` : fullPathList.join('/');
+    const fullPath = fullPathList.length === 1 ? `/${fullPathList[0]}/` : `/${fullPathList.join('/')}`;
     this.setSelectPath(fullPath);
     this.getDirFiles();
   }
@@ -117,7 +117,6 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
   }
 
   checkItem($event, dirFile: DirFileInfo): void {
-    console.log('checkitem');
     if ($event.target.checked) {
       this.selectDirFiles.push(dirFile);
     } else {

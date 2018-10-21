@@ -27,33 +27,50 @@ namespace Chaldea.Node.Services
 
         public ICollection<DirFileInfo> GetDirFiles(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            try
             {
-                var rootDirs = new List<DirFileInfo>();
-                foreach (var rootDir in _options.Value.RootDirs)
+                if (string.IsNullOrEmpty(path))
                 {
-                    var dirInfo = new DirectoryInfo(rootDir);
-                    rootDirs.Add(new DirFileInfo
+                    var rootDirs = new List<DirFileInfo>();
+                    foreach (var rootDir in _options.Value.RootDirs)
                     {
-                        ModifyTime = dirInfo.LastWriteTime, Name = dirInfo.Name, FullName = dirInfo.FullName,
-                        Type = DirFileType.Directory
-                    });
+                        var dirInfo = new DirectoryInfo(rootDir);
+                        rootDirs.Add(new DirFileInfo
+                        {
+                            ModifyTime = dirInfo.LastWriteTime,
+                            Name = dirInfo.Name,
+                            FullName = dirInfo.FullName,
+                            Type = DirFileType.Directory
+                        });
+                    }
+
+                    return rootDirs;
                 }
 
-                return rootDirs;
+                var dir = new DirectoryInfo(path);
+                var list = dir.GetDirectories().Select(x => new DirFileInfo
+                    {
+                        ModifyTime = x.LastWriteTime, Name = x.Name, Type = DirFileType.Directory, FullName = x.FullName
+                    })
+                    .OrderBy(x => x.Name).ToList();
+                var files = dir.GetFiles().Select(x => new DirFileInfo
+                {
+                    ModifyTime = x.LastWriteTime,
+                    Name = x.Name,
+                    Size = FileHelper.GetSize(x.Length),
+                    Length = x.Length,
+                    FullName = x.FullName,
+                    Type = DirFileType.File
+                }).ToList();
+                list.AddRange(files);
+                return list;
             }
-
-            var dir = new DirectoryInfo(path);
-            var list = dir.GetDirectories().Select(x => new DirFileInfo
-                    {ModifyTime = x.LastWriteTime, Name = x.Name, Type = DirFileType.Directory, FullName = x.FullName})
-                .OrderBy(x => x.Name).ToList();
-            var files = dir.GetFiles().Select(x => new DirFileInfo
+            catch (Exception ex)
             {
-                ModifyTime = x.LastWriteTime, Name = x.Name, Size = FileHelper.GetSize(x.Length), Length = x.Length, FullName = x.FullName,
-                Type = DirFileType.File
-            }).ToList();
-            list.AddRange(files);
-            return list;
+                // todo: Refactor rpc proxy, so that can return message to caller.
+                _logger.LogError(ex.ToString());
+                return new List<DirFileInfo>();
+            }
         }
 
         public string DeleteDirFiles(ICollection<DirFileInfo> dirFiles)

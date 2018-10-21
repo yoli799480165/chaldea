@@ -27,12 +27,15 @@ namespace Chaldea.Services.Nodes
         public override Task OnConnectedAsync()
         {
             var httpContext = Context.GetHttpContext();
+            var address = httpContext.Connection.RemoteIpAddress.IsIPv4MappedToIPv6
+                ? httpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
+                : httpContext.Connection.RemoteIpAddress.ToString();
             var node = new Node
             {
                 Id = httpContext.Request.Query["nodeId"],
                 OsType = httpContext.Request.Query["osType"],
-                Ip = httpContext.Connection.RemoteIpAddress.ToString(),
-                Name = httpContext.Connection.RemoteIpAddress.ToString(),
+                Ip = address,
+                Name = address,
                 ConnectionId = Context.ConnectionId
             };
             _logger.LogInformation($"Node {node.Id} conected, ip: {node.Ip}");

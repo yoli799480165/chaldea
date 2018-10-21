@@ -1281,6 +1281,70 @@ export class UserServiceProxy {
     }
 }
 
+@Injectable()
+export class VideoServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getVideo(id: string): Observable<VideoDto> {
+        let url_ = this.baseUrl + "/api/video/{id}/getVideo";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetVideo(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetVideo(response_);
+                } catch (e) {
+                    return <Observable<VideoDto>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<VideoDto>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetVideo(response: HttpResponse<Blob>): Observable<VideoDto> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? VideoDto.fromJS(resultData200) : new VideoDto();
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<VideoDto>(<any>null);
+    }
+}
+
 export class AnimeOutlineDto implements IAnimeOutlineDto {
     id: string | undefined;
     title: string | undefined;
@@ -1338,9 +1402,9 @@ export class AnimeDto implements IAnimeDto {
     type: string | undefined;
     level: number | undefined;
     tags: string[] | undefined;
-    videos: string[] | undefined;
-    comics: string[] | undefined;
-    novels: string[] | undefined;
+    videos: Resource[] | undefined;
+    comics: Resource[] | undefined;
+    novels: Resource[] | undefined;
     comments: string[] | undefined;
 
     constructor(data?: IAnimeDto) {
@@ -1374,17 +1438,17 @@ export class AnimeDto implements IAnimeDto {
             if (data["videos"] && data["videos"].constructor === Array) {
                 this.videos = [];
                 for (let item of data["videos"])
-                    this.videos.push(item);
+                    this.videos.push(Resource.fromJS(item));
             }
             if (data["comics"] && data["comics"].constructor === Array) {
                 this.comics = [];
                 for (let item of data["comics"])
-                    this.comics.push(item);
+                    this.comics.push(Resource.fromJS(item));
             }
             if (data["novels"] && data["novels"].constructor === Array) {
                 this.novels = [];
                 for (let item of data["novels"])
-                    this.novels.push(item);
+                    this.novels.push(Resource.fromJS(item));
             }
             if (data["comments"] && data["comments"].constructor === Array) {
                 this.comments = [];
@@ -1422,17 +1486,17 @@ export class AnimeDto implements IAnimeDto {
         if (this.videos && this.videos.constructor === Array) {
             data["videos"] = [];
             for (let item of this.videos)
-                data["videos"].push(item);
+                data["videos"].push(item.toJSON());
         }
         if (this.comics && this.comics.constructor === Array) {
             data["comics"] = [];
             for (let item of this.comics)
-                data["comics"].push(item);
+                data["comics"].push(item.toJSON());
         }
         if (this.novels && this.novels.constructor === Array) {
             data["novels"] = [];
             for (let item of this.novels)
-                data["novels"].push(item);
+                data["novels"].push(item.toJSON());
         }
         if (this.comments && this.comments.constructor === Array) {
             data["comments"] = [];
@@ -1457,10 +1521,49 @@ export interface IAnimeDto {
     type: string | undefined;
     level: number | undefined;
     tags: string[] | undefined;
-    videos: string[] | undefined;
-    comics: string[] | undefined;
-    novels: string[] | undefined;
+    videos: Resource[] | undefined;
+    comics: Resource[] | undefined;
+    novels: Resource[] | undefined;
     comments: string[] | undefined;
+}
+
+export class Resource implements IResource {
+    id: string | undefined;
+    name: string | undefined;
+
+    constructor(data?: IResource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.name = data["name"];
+        }
+    }
+
+    static fromJS(data: any): Resource {
+        let result = new Resource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data; 
+    }
+}
+
+export interface IResource {
+    id: string | undefined;
+    name: string | undefined;
 }
 
 export class AnimeTagDto implements IAnimeTagDto {
@@ -2088,6 +2191,73 @@ export interface IPublishDirFileInfo {
     modifyTime: moment.Moment | undefined;
     size: string | undefined;
     length: number | undefined;
+}
+
+export class VideoDto implements IVideoDto {
+    size: string | undefined;
+    cover: string | undefined;
+    title: string | undefined;
+    url: string | undefined;
+    duration: number | undefined;
+    frameWidth: number | undefined;
+    frameHeight: number | undefined;
+    frameRate: number | undefined;
+    id: string | undefined;
+
+    constructor(data?: IVideoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.size = data["size"];
+            this.cover = data["cover"];
+            this.title = data["title"];
+            this.url = data["url"];
+            this.duration = data["duration"];
+            this.frameWidth = data["frameWidth"];
+            this.frameHeight = data["frameHeight"];
+            this.frameRate = data["frameRate"];
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): VideoDto {
+        let result = new VideoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["size"] = this.size;
+        data["cover"] = this.cover;
+        data["title"] = this.title;
+        data["url"] = this.url;
+        data["duration"] = this.duration;
+        data["frameWidth"] = this.frameWidth;
+        data["frameHeight"] = this.frameHeight;
+        data["frameRate"] = this.frameRate;
+        data["id"] = this.id;
+        return data; 
+    }
+}
+
+export interface IVideoDto {
+    size: string | undefined;
+    cover: string | undefined;
+    title: string | undefined;
+    url: string | undefined;
+    duration: number | undefined;
+    frameWidth: number | undefined;
+    frameHeight: number | undefined;
+    frameRate: number | undefined;
+    id: string | undefined;
 }
 
 export enum NodeState {

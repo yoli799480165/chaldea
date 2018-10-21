@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace Chaldea.Services
+namespace Chaldea.Services.Banners
 {
     [Route("api/banner")]
     public class BannerService : ServiceBase

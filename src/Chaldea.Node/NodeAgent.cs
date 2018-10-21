@@ -6,20 +6,24 @@ using Chaldea.Core.Nodes;
 using Chaldea.Node.Configuration;
 using Chaldea.Node.Services;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Chaldea.Node
 {
     public class NodeAgent
     {
+        private readonly ILogger<NodeAgent> _logger;
         private bool _isConnected;
 
         public NodeAgent(
+            ILogger<NodeAgent> logger,
             IOptions<Appsettings> options,
             DirectoryService directoryService,
             BaiduDiskService baiduDiskService,
             FFmpegService fFmpegService)
         {
+            _logger = logger;
             Connection = new HubConnectionBuilder()
                 .WithUrl($"{options.Value.NodeServer}/node?nodeId={GetId()}")
                 .Build();
@@ -60,6 +64,13 @@ namespace Chaldea.Node
                 var videoInfos = fFmpegService.GetVideoInfos(files);
                 await Connection.InvokeAsync("getVideoInfosResponse", eventId, videoInfos);
             });
+
+            Connection.Closed += ex =>
+            {
+                _isConnected = false;
+                _logger.LogInformation($"The connection is closed, {ex}");
+                return Task.CompletedTask;
+            };
         }
 
         public HubConnection Connection { get; set; }
@@ -76,6 +87,7 @@ namespace Chaldea.Node
                         {
                             await Connection.StartAsync();
                             _isConnected = true;
+                            _logger.LogInformation("Connect to server successly.");
                         }
                         catch (Exception)
                         {

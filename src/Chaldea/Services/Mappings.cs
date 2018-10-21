@@ -4,6 +4,7 @@ using Chaldea.Repositories;
 using Chaldea.Services.Animes.Dto;
 using Chaldea.Services.AnimeTags.Dto;
 using Chaldea.Services.Bangumis.Dto;
+using Chaldea.Services.Videos.Dto;
 
 namespace Chaldea.Services
 {
@@ -17,6 +18,7 @@ namespace Chaldea.Services
                 cfg.CreateMap<BangumiAnimesDto, Bangumi>();
                 cfg.CreateMap<AnimeOutlineDto, Anime>();
                 cfg.CreateMap<AnimeTagDto, AnimeTag>();
+                cfg.CreateMap<VideoDto, Video>();
                 cfg.CreateMap<ICollection<BangumiDto>, ICollection<Bangumi>>();
                 cfg.CreateMap<ICollection<AnimeOutlineDto>, ICollection<Anime>>();
             });
