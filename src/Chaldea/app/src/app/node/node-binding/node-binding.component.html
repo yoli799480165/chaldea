@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">绑定网盘</h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body folder-tree">
+  <p>
+    绑定本地目录：{{localPath}}
+  </p>
+  <tree 
+    [tree]="tree" 
+    (nodeExpanded)="handleExpanded($event)"
+    (nodeSelected)="handleSelected($event)">
+  </tree>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-info btn-fill" (click)="bind()">
+    <i class="fa fa-plus"></i>
+    绑定
+  </button>
+</div>

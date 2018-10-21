@@ -75,5 +75,33 @@ namespace Chaldea.Services.Nodes
             _eventManager.Emit(eventId, msg);
             return Task.CompletedTask;
         }
+
+
+        public Task GetNetDiskDirFilesResponse(Guid eventId, List<DirFileInfo> data)
+        {
+            var httpContext = Context.GetHttpContext();
+            var id = httpContext.Request.Query["nodeId"];
+            _logger.LogInformation($"Node {id} call method: {nameof(GetNetDiskDirFilesResponse)}");
+            _eventManager.Emit(eventId, data);
+            return Task.CompletedTask;
+        }
+
+        public Task SyncDirResponse(Guid eventId, string msg)
+        {
+            var httpContext = Context.GetHttpContext();
+            var id = httpContext.Request.Query["nodeId"];
+            _logger.LogInformation($"Node {id} call method: {nameof(SyncDirResponse)}");
+            _eventManager.Emit(eventId, msg);
+            return Task.CompletedTask;
+        }
+
+        public Task GetVideoInfosResponse(Guid eventId, ICollection<VideoInfo> data)
+        {
+            var httpContext = Context.GetHttpContext();
+            var id = httpContext.Request.Query["nodeId"];
+            _logger.LogInformation($"Node {id} call method: {nameof(GetVideoInfosResponse)}");
+            _eventManager.Emit(eventId, data);
+            return Task.CompletedTask;
+        }
     }
 }

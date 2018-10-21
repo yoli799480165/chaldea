@@ -1,16 +1,22 @@
 import { Injector } from '@angular/core';
 import { ModalService } from 'app/shared/modal-service';
 import { NgxCoolDialogsService } from 'ngx-cool-dialogs';
+import { LoadingService } from './loading-service';
+import { RouterService } from './router-service';
 
 declare var $: any;
 
 export class ComponentBase {
   public dialog: NgxCoolDialogsService;
   public modal: ModalService;
+  public loading: LoadingService;
+  public dataRouter: RouterService
 
   constructor(injector: Injector) {
     this.modal = injector.get(ModalService);
     this.dialog = injector.get(NgxCoolDialogsService);
+    this.loading = injector.get(LoadingService);
+    this.dataRouter = injector.get(RouterService);
   }
 
   closeModal(): void {

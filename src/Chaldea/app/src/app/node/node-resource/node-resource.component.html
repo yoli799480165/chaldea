@@ -14,8 +14,10 @@
                   <i class="fa fa-trash-o"></i>删除</button>
                 <button (click)="extractFiles()">
                   <i class="fa fa-file-archive-o"></i>解压</button>
-                <button>
-                  <i class="fa fa-paw"></i>网盘同步</button>
+                <button (click)="bindNetDisk()">
+                  <i class="fa fa-paw"></i>绑定网盘</button>
+                <button (click)="publish()">
+                  <i class="fa fa-share"></i>发布资源</button>
               </div>
               <div class="nav">
                 <a class="btn-item" (click)="goHome()">
@@ -46,7 +48,7 @@
                 <thead>
                   <tr>
                     <th class="check">
-                      <input type="checkbox">
+                      <input type="checkbox" (change)="checkAll($event)">
                     </th>
                     <th>
                       文件名
@@ -57,22 +59,27 @@
                     <th>
                       大小
                     </th>
+                    <th>
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody [sortablejs]="dirFiles">
                   <tr *ngFor="let dirFile of dirFiles" (dblclick)="getSubDirFiles(dirFile)">
                     <td class="check">
-                      <input type="checkbox" (change)="checkItem($event, dirFile)">
+                      <input type="checkbox" [checked]="dirFile.checked" (change)="checkItem($event, dirFile)">
                     </td>
                     <td>
-                      <i class="fa" [ngClass]="{'fa-folder-o': dirFile.type == 0, 'fa-file-o': dirFile.type == 1}"></i>
+                      <i class="fa fa-lg" [ngClass]="{'fa-folder-o': dirFile.type == 0, 'fa-file-o': dirFile.type == 1}"></i>
                       {{dirFile.name}}
                     </td>
                     <td>
                       {{dirFile.modifyTime | date:'yyyy-MM-dd HH:mm'}}
                     </td>
                     <td>
-                      {{dirFile.type == 0 ? '-' : fileSize(dirFile.length)}}
+                      {{dirFile.type == 0 ? '-' : dirFile.size}}
+                    </td>
+                    <td>
+                      <i class="fa fa-lg fa-cloud-download sync" *ngIf="dirFile.sync" (click)="sync(dirFile)"></i>
                     </td>
                   </tr>
                 </tbody>

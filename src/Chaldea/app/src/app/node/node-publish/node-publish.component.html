@@ -1,0 +1,52 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">发布资源</h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body publish">
+  <div class="form-group">
+    <label>请选择番剧:</label>
+    <ngx-select-dropdown [config]="config" [options]="animes" [(value)]="selectAnimes" [multiple]="false">
+    </ngx-select-dropdown>
+  </div>
+
+  <div class="form-group">
+    <label>显示格式:</label>
+    <input type="text" class="form-control" placeholder="第{0}话" [(ngModel)]="displayFormat" (ngModelChange)="format($event)">
+  </div>
+
+  <div class="form-group">
+    <label>链接格式:</label>
+    <input type="text" class="form-control" [(ngModel)]="urlPrefix" (ngModelChange)="setUrl($event)">
+  </div>
+
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th class="display-name">
+          显示名称
+        </th>
+        <th>
+          文件名称
+        </th>
+        <th>
+          链接
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let dirFile of selectDirFiles; let i = index;">
+        <td class="display-name">{{dirFile.displayName}}</td>
+        <td>{{dirFile.name}}</td>
+        <td>{{dirFile.url}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-info btn-fill" (click)="publish()">
+    <i class="fa fa-share"></i>
+    发布
+  </button>
+</div>

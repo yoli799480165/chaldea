@@ -9,6 +9,7 @@ import { BangumiComponent } from './bangumi/bangumi.component';
 import { AnimeComponent } from './anime/anime.component';
 import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
 import { NodeResourceComponent } from './node/node-resource/node-resource.component';
+import { NodePublishComponent } from './node/node-publish/node-publish.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: HomeComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'anime', component: AnimeComponent },
   { path: 'anime-detail/:animeId', component: AnimeDetailComponent },
   { path: 'node-resource', component: NodeResourceComponent },
+  { path: 'node-publish/:key', component: NodePublishComponent },
   { path: 'notifications', component: NotificationsComponent },
   { path: 'upgrade', component: UpgradeComponent },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' }

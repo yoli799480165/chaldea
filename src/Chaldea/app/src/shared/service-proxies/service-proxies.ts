@@ -914,7 +914,7 @@ export class NodeServiceProxy {
             })
         };
 
-        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
             return this.processExtractFiles(response_);
         }).catch((response_: any) => {
             if (response_ instanceof HttpResponse) {
@@ -945,6 +945,282 @@ export class NodeServiceProxy {
             });
         }
         return Observable.of<string>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    getNetDiskDirFiles(nodeId: string, input: GetDirFileDto | null): Observable<DirFileInfo[]> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/getNetDiskDirFiles";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processGetNetDiskDirFiles(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetNetDiskDirFiles(response_);
+                } catch (e) {
+                    return <Observable<DirFileInfo[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<DirFileInfo[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetNetDiskDirFiles(response: HttpResponse<Blob>): Observable<DirFileInfo[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(DirFileInfo.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<DirFileInfo[]>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    bindSyncDir(nodeId: string, input: SyncDirectory | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/bindSyncDir";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processBindSyncDir(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processBindSyncDir(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processBindSyncDir(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getSyncDirs(nodeId: string): Observable<SyncDirectory[]> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/getSyncDirs";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetSyncDirs(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetSyncDirs(response_);
+                } catch (e) {
+                    return <Observable<SyncDirectory[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<SyncDirectory[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetSyncDirs(response: HttpResponse<Blob>): Observable<SyncDirectory[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(SyncDirectory.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<SyncDirectory[]>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    syncDir(nodeId: string, input: SyncDirectory | null): Observable<string> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/syncDir";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processSyncDir(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processSyncDir(response_);
+                } catch (e) {
+                    return <Observable<string>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<string>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processSyncDir(response: HttpResponse<Blob>): Observable<string> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<string>(<any>null);
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    publishResource(nodeId: string, input: PublishResourceDto | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/node/{nodeId}/publishResource";
+        if (nodeId === undefined || nodeId === null)
+            throw new Error("The parameter 'nodeId' must be defined.");
+        url_ = url_.replace("{nodeId}", encodeURIComponent("" + nodeId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processPublishResource(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processPublishResource(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processPublishResource(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
     }
 }
 
@@ -1564,6 +1840,7 @@ export class DirFileInfo implements IDirFileInfo {
     name: string | undefined;
     fullName: string | undefined;
     modifyTime: moment.Moment | undefined;
+    size: string | undefined;
     length: number | undefined;
 
     constructor(data?: IDirFileInfo) {
@@ -1581,6 +1858,7 @@ export class DirFileInfo implements IDirFileInfo {
             this.name = data["name"];
             this.fullName = data["fullName"];
             this.modifyTime = data["modifyTime"] ? moment(data["modifyTime"].toString()) : <any>undefined;
+            this.size = data["size"];
             this.length = data["length"];
         }
     }
@@ -1597,6 +1875,7 @@ export class DirFileInfo implements IDirFileInfo {
         data["name"] = this.name;
         data["fullName"] = this.fullName;
         data["modifyTime"] = this.modifyTime ? this.modifyTime.toISOString() : <any>undefined;
+        data["size"] = this.size;
         data["length"] = this.length;
         return data; 
     }
@@ -1607,6 +1886,7 @@ export interface IDirFileInfo {
     name: string | undefined;
     fullName: string | undefined;
     modifyTime: moment.Moment | undefined;
+    size: string | undefined;
     length: number | undefined;
 }
 
@@ -1661,12 +1941,166 @@ export interface IExtractFileDto {
     password: string | undefined;
 }
 
+export class SyncDirectory implements ISyncDirectory {
+    local: string | undefined;
+    remote: string | undefined;
+
+    constructor(data?: ISyncDirectory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.local = data["local"];
+            this.remote = data["remote"];
+        }
+    }
+
+    static fromJS(data: any): SyncDirectory {
+        let result = new SyncDirectory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["local"] = this.local;
+        data["remote"] = this.remote;
+        return data; 
+    }
+}
+
+export interface ISyncDirectory {
+    local: string | undefined;
+    remote: string | undefined;
+}
+
+export class PublishResourceDto implements IPublishResourceDto {
+    animeId: string | undefined;
+    publishFiles: PublishDirFileInfo[] | undefined;
+
+    constructor(data?: IPublishResourceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.animeId = data["animeId"];
+            if (data["publishFiles"] && data["publishFiles"].constructor === Array) {
+                this.publishFiles = [];
+                for (let item of data["publishFiles"])
+                    this.publishFiles.push(PublishDirFileInfo.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PublishResourceDto {
+        let result = new PublishResourceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["animeId"] = this.animeId;
+        if (this.publishFiles && this.publishFiles.constructor === Array) {
+            data["publishFiles"] = [];
+            for (let item of this.publishFiles)
+                data["publishFiles"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IPublishResourceDto {
+    animeId: string | undefined;
+    publishFiles: PublishDirFileInfo[] | undefined;
+}
+
+export class PublishDirFileInfo implements IPublishDirFileInfo {
+    displayName: string | undefined;
+    url: string | undefined;
+    type: PublishDirFileInfoType | undefined;
+    name: string | undefined;
+    fullName: string | undefined;
+    modifyTime: moment.Moment | undefined;
+    size: string | undefined;
+    length: number | undefined;
+
+    constructor(data?: IPublishDirFileInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.displayName = data["displayName"];
+            this.url = data["url"];
+            this.type = data["type"];
+            this.name = data["name"];
+            this.fullName = data["fullName"];
+            this.modifyTime = data["modifyTime"] ? moment(data["modifyTime"].toString()) : <any>undefined;
+            this.size = data["size"];
+            this.length = data["length"];
+        }
+    }
+
+    static fromJS(data: any): PublishDirFileInfo {
+        let result = new PublishDirFileInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["displayName"] = this.displayName;
+        data["url"] = this.url;
+        data["type"] = this.type;
+        data["name"] = this.name;
+        data["fullName"] = this.fullName;
+        data["modifyTime"] = this.modifyTime ? this.modifyTime.toISOString() : <any>undefined;
+        data["size"] = this.size;
+        data["length"] = this.length;
+        return data; 
+    }
+}
+
+export interface IPublishDirFileInfo {
+    displayName: string | undefined;
+    url: string | undefined;
+    type: PublishDirFileInfoType | undefined;
+    name: string | undefined;
+    fullName: string | undefined;
+    modifyTime: moment.Moment | undefined;
+    size: string | undefined;
+    length: number | undefined;
+}
+
 export enum NodeState {
     _0 = 0, 
     _1 = 1, 
 }
 
 export enum DirFileInfoType {
+    _0 = 0, 
+    _1 = 1, 
+}
+
+export enum PublishDirFileInfoType {
     _0 = 0, 
     _1 = 1, 
 }

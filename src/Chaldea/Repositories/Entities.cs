@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using Chaldea.Core.Nodes;
 
 namespace Chaldea.Repositories
 {
@@ -84,17 +83,17 @@ namespace Chaldea.Repositories
         /// <summary>
         ///     视频资源
         /// </summary>
-        public List<string> Videos { get; set; }
+        public List<Resource> Videos { get; set; }
 
         /// <summary>
         ///     漫画资源
         /// </summary>
-        public List<string> Comics { get; set; }
+        public List<Resource> Comics { get; set; }
 
         /// <summary>
         ///     小说资源
         /// </summary>
-        public List<string> Novels { get; set; }
+        public List<Resource> Novels { get; set; }
 
         /// <summary>
         ///     评论
@@ -122,6 +121,16 @@ namespace Chaldea.Repositories
     }
 
     /// <summary>
+    ///     资源信息
+    /// </summary>
+    public class Resource
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+    }
+
+    /// <summary>
     ///     视频资源
     /// </summary>
     public class Video : IEntity<string>
@@ -132,14 +141,29 @@ namespace Chaldea.Repositories
         public string FileName { get; set; }
 
         /// <summary>
-        ///     文件大小
+        ///     文件长度
         /// </summary>
         public long Length { get; set; }
+
+        /// <summary>
+        ///     文件大小
+        /// </summary>
+        public string Size { get; set; }
+
+        /// <summary>
+        ///     封面
+        /// </summary>
+        public string Cover { get; set; }
 
         /// <summary>
         ///     显示标题
         /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        ///     副标题
+        /// </summary>
+        public string SubTitle { get; set; }
 
         /// <summary>
         ///     链接地址
@@ -166,8 +190,9 @@ namespace Chaldea.Repositories
         /// </summary>
         public int FrameRate { get; set; }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        /// <summary>
+        ///     Id
+        /// </summary>
         public string Id { get; set; }
     }
 
@@ -176,8 +201,6 @@ namespace Chaldea.Repositories
     /// </summary>
     public class Comic : IEntity<string>
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
     }
 
@@ -186,8 +209,6 @@ namespace Chaldea.Repositories
     /// </summary>
     public class Novel : IEntity<string>
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
     }
 
@@ -200,8 +221,6 @@ namespace Chaldea.Repositories
 
         public string UserId { get; set; }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
     }
 
@@ -216,8 +235,6 @@ namespace Chaldea.Repositories
 
         public string Title { get; set; }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
     }
 
@@ -226,8 +243,6 @@ namespace Chaldea.Repositories
     /// </summary>
     public class Achievement : IEntity<string>
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
     }
 
@@ -238,8 +253,6 @@ namespace Chaldea.Repositories
     {
         public string MetaData { get; set; }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
     }
 
@@ -276,6 +289,16 @@ namespace Chaldea.Repositories
         /// <summary>
         ///     Id
         /// </summary>
+        public string Id { get; set; }
+    }
+
+    /// <summary>
+    ///     节点配置
+    /// </summary>
+    public class NodeConfig : IEntity<string>
+    {
+        public ICollection<SyncDirectory> SyncDirectories { get; set; }
+
         public string Id { get; set; }
     }
 

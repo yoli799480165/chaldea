@@ -1,6 +1,8 @@
 import { Component, OnInit, Injector } from '@angular/core';
-import { NodeServiceProxy, Node, GetDirFileDto, DirFileInfo, ExtractFileDto } from 'shared/service-proxies/service-proxies';
+import { NodeServiceProxy, Node, GetDirFileDto, DirFileInfo, ExtractFileDto, SyncDirectory } from 'shared/service-proxies/service-proxies';
 import { ComponentBase } from 'app/shared/component-base';
+import { NodeBindingComponent } from '../node-binding/node-binding.component';
+import { NodePublishComponent } from '../node-publish/node-publish.component';
 
 @Component({
   selector: 'app-node-resource',
@@ -14,6 +16,7 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
   pathList: string[] = [];
   selectPath = '';
   selectDirFiles: DirFileInfo[] = [];
+  syncDirs: SyncDirectory[] = [];
 
   constructor(
     private injector: Injector,
@@ -27,12 +30,20 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
   }
 
   getNodes(): void {
+    this.loading.show();
     this.nodeServiceProxy.getNodes().subscribe((rep) => {
       this.nodes = rep;
       if (this.nodes && this.nodes.length > 0) {
         this.selectedNode = this.nodes[0];
-        this.getDirFiles();
+        this.getSyncDirs();
       }
+    });
+  }
+
+  getSyncDirs(): void {
+    this.nodeServiceProxy.getSyncDirs(this.selectedNode.id).subscribe((rep) => {
+      this.syncDirs = rep;
+      this.getDirFiles();
     });
   }
 
@@ -40,9 +51,24 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
     this.selectDirFiles = [];
     const input = new GetDirFileDto();
     input.path = this.selectPath;
-    console.log(this.pathList);
+    this.loading.show();
     this.nodeServiceProxy.getDirFiles(this.selectedNode.id, input).subscribe((rep) => {
+      rep.forEach(dirFile => {
+        dirFile['checked'] = false;
+        dirFile['sync'] = false;
+        dirFile['syncDir'] = '';
+        this.syncDirs.forEach(syncDir => {
+          if (dirFile.fullName === syncDir.local) {
+            dirFile['sync'] = true;
+            dirFile['syncDir'] = syncDir.remote;
+            return false;
+          }
+        })
+      });
       this.dirFiles = rep;
+      this.loading.hide();
+    }, (err) => {
+      this.loading.hide();
     });
   }
 
@@ -80,7 +106,18 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
     this.pathList = replacePath.split('>');
   }
 
+  checkAll($event): void {
+    this.selectDirFiles = [];
+    this.dirFiles.forEach(item => {
+      item['checked'] = $event.target.checked;
+      if ($event.target.checked) {
+        this.selectDirFiles.push(item);
+      }
+    });
+  }
+
   checkItem($event, dirFile: DirFileInfo): void {
+    console.log('checkitem');
     if ($event.target.checked) {
       this.selectDirFiles.push(dirFile);
     } else {
@@ -91,8 +128,8 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
 
   deleteItems(): void {
     if (this.selectDirFiles.length > 0) {
-      this.dialog.confirm('确定删除所选文件及文件夹?').subscribe((rep) => {
-        if (rep) {
+      this.dialog.confirm('确定删除所选文件及文件夹?').subscribe((result) => {
+        if (result) {
           this.nodeServiceProxy.deleteDirFiles(this.selectedNode.id, this.selectDirFiles).subscribe((msg) => {
             this.getDirFiles();
             if (msg && msg !== '') {
@@ -116,18 +153,51 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
           this.dialog.alert(msg);
         }
       });
+    } else {
+      this.dialog.alert('请选择压缩文件.');
     }
   }
 
-  fileSize(length: number): string {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    const mod = 1024.0;
-    let i = 0;
-    while (length >= mod) {
-      length /= mod;
-      i++;
+  bindNetDisk(): void {
+    if (this.selectDirFiles.length === 1) {
+      this.modal.show(NodeBindingComponent, { nodeId: this.selectedNode.id, selectPath: this.selectDirFiles[0].fullName }).subscribe(() => {
+        this.getSyncDirs();
+      })
+    } else if (this.selectDirFiles.length > 1) {
+      this.dialog.alert('只能选择单个目录.');
+    } else {
+      this.dialog.alert('请选择目录.');
     }
-    return Math.round(length) + units[i];
+  }
+
+  sync(dirFile): void {
+    this.dialog.confirm(`确定要同步文件夹:${dirFile.syncDir}`).subscribe((result) => {
+      if (result) {
+        const input = new SyncDirectory();
+        input.local = dirFile.fullName;
+        input.remote = dirFile.syncDir;
+        this.nodeServiceProxy.syncDir(this.selectedNode.id, input).subscribe((msg) => {
+          if (msg && msg !== '') {
+            this.dialog.alert(msg);
+          }
+        });
+      }
+    });
+  }
+
+  publish(): void {
+    if (this.selectDirFiles.length > 0) {
+      const data = {
+        nodeId: this.selectedNode.id,
+        selectPath: this.selectPath,
+        selectDirFiles: this.selectDirFiles
+      };
+      this.modal.show(NodePublishComponent, data, { class: 'modal-lg' }).subscribe((rep) => {
+        this.showTips('发布成功', 'success');
+      });
+    } else {
+      this.dialog.alert('请选择要发布的文件.');
+    }
   }
 
   trim(s: string, c: string): string {

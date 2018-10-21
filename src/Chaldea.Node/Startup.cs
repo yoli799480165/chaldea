@@ -21,13 +21,16 @@ namespace Chaldea.Node
         {
             services.Configure<Appsettings>(Configuration.GetSection("Appsettings"));
             services.Configure<BaiduDiskSettings>(Configuration.GetSection("BaiduDisk"));
+            services.Configure<FFmpegSettings>(Configuration.GetSection("FFmpeg"));
             services.AddMvcCore()
                 .AddJsonFormatters()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddApiExplorer();
 
             services.AddSingleton<NodeAgent>();
-            services.AddTransient<DirectoryService>();
+            services.AddSingleton<DirectoryService>();
+            services.AddSingleton<BaiduDiskService>();
+            services.AddSingleton<FFmpegService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

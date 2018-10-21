@@ -37,7 +37,7 @@ export class AnimeComponent extends ComponentBase implements OnInit {
       bangumi.name = '显示全部';
       rep.unshift(bangumi);
       this.bangumis = rep;
-      this.selectBangumi = bangumi;
+      this.selectBangumi = rep.length > 1 ? rep[1] : rep[0];
       this.getList();
     });
   }

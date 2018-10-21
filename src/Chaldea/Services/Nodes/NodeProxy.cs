@@ -54,6 +54,36 @@ namespace Chaldea.Services.Nodes
             var data = await result.subject.GetAwaiter();
             return data as string;
         }
+
+        public async Task<List<DirFileInfo>> GetNetDiskDirFiles(string nodeId, string path)
+        {
+            (Guid eventId, Subject<object> subject) result = _eventManager.Create();
+            var connectionId = _nodeManager.GetConnectionId(nodeId);
+            if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
+            await _hubContext.Clients.Client(connectionId).SendAsync("getNetDiskDirFiles", result.eventId, path);
+            var data = await result.subject.GetAwaiter();
+            return data as List<DirFileInfo>;
+        }
+
+        public async Task<string> SyncDir(string nodeId, SyncDirectory syncDirectory)
+        {
+            (Guid eventId, Subject<object> subject) result = _eventManager.Create();
+            var connectionId = _nodeManager.GetConnectionId(nodeId);
+            if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
+            await _hubContext.Clients.Client(connectionId).SendAsync("syncDir", result.eventId, syncDirectory);
+            var data = await result.subject.GetAwaiter();
+            return data as string;
+        }
+
+        public async Task<ICollection<VideoInfo>> GetVideoInfos(string nodeId, ICollection<string> file)
+        {
+            (Guid eventId, Subject<object> subject) result = _eventManager.Create();
+            var connectionId = _nodeManager.GetConnectionId(nodeId);
+            if (string.IsNullOrEmpty(connectionId)) throw new Exception("ConnectionId is null, node was not found.");
+            await _hubContext.Clients.Client(connectionId).SendAsync("getVideoInfos", result.eventId, file);
+            var data = await result.subject.GetAwaiter();
+            return data as ICollection<VideoInfo>;
+        }
     }
 
     public class EventManager

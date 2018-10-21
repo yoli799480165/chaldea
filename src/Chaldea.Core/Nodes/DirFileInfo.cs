@@ -15,5 +15,6 @@ namespace Chaldea.Core.Nodes
         public string FullName { get; set; }
         public DateTime ModifyTime { get; set; }
         public string Size { get; set; }
+        public long Length { get; set; }
     }
 }

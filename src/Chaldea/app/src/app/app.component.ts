@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
+import { LoadingService } from './shared/loading-service';
 
 @Component({
   selector: 'app-root',
@@ -7,8 +8,16 @@ import { Location } from '@angular/common';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  loading = false;
 
-  constructor(public location: Location) { }
+  constructor(
+    public location: Location,
+    private loadingService: LoadingService
+  ) {
+    this.loadingService.subject.subscribe((rep: boolean) => {
+      this.loading = rep;
+    });
+  }
 
   ngOnInit() {
   }

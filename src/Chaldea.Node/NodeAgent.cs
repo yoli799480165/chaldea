@@ -16,7 +16,9 @@ namespace Chaldea.Node
 
         public NodeAgent(
             IOptions<Appsettings> options,
-            DirectoryService directoryService)
+            DirectoryService directoryService,
+            BaiduDiskService baiduDiskService,
+            FFmpegService fFmpegService)
         {
             Connection = new HubConnectionBuilder()
                 .WithUrl($"{options.Value.NodeServer}/node?nodeId={GetId()}")
@@ -40,6 +42,24 @@ namespace Chaldea.Node
                     var msg = directoryService.ExtractFiles(extractFileInfo);
                     await Connection.InvokeAsync("extractFilesResponse", eventId, msg);
                 });
+
+            Connection.On<Guid, string>("getNetDiskDirFiles", async (eventId, path) =>
+            {
+                var rootDirs = baiduDiskService.GetDirFiles(path);
+                await Connection.InvokeAsync("getNetDiskDirFilesResponse", eventId, rootDirs);
+            });
+
+            Connection.On<Guid, SyncDirectory>("syncDir", async (eventId, syncDir) =>
+            {
+                var msg = baiduDiskService.SyncDir(syncDir);
+                await Connection.InvokeAsync("syncDirResponse", eventId, msg);
+            });
+
+            Connection.On<Guid, ICollection<string>>("getVideoInfos", async (eventId, files) =>
+            {
+                var videoInfos = fFmpegService.GetVideoInfos(files);
+                await Connection.InvokeAsync("getVideoInfosResponse", eventId, videoInfos);
+            });
         }
 
         public HubConnection Connection { get; set; }

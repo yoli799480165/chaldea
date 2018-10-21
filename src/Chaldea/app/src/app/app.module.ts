@@ -5,18 +5,33 @@ import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { SortablejsModule } from 'angular-sortablejs';
+import { ModalService } from 'app/shared/modal-service';
 import { DictionaryPipe } from 'app/shared/pipes/dictionary.pipe';
 import { SafeHtmlPipe } from 'app/shared/pipes/safe-html.pipe';
+import { TreeModule } from 'ng2-tree';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxCoolDialogsModule } from 'ngx-cool-dialogs';
 import { AppConsts } from 'shared/AppConsts';
 import { ServiceProxyModule } from 'shared/service-proxies/service-proxy.module';
+import { SelectDropDownModule } from 'ngx-select-dropdown'
+import { NgxLoadingModule } from 'ngx-loading';
 
 import { API_BASE_URL } from '../shared/service-proxies/service-proxies';
+import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
+import { AnimeImportComponent } from './anime/anime-import/anime-import.component';
+import { AnimeComponent } from './anime/anime.component';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing';
+import { BangumiEditComponent } from './bangumi/bangumi-edit/bangumi-edit.component';
+import { BangumiComponent } from './bangumi/bangumi.component';
 import { HomeComponent } from './home/home.component';
 import { IconsComponent } from './icons/icons.component';
 import { LbdModule } from './lbd/lbd.module';
+import { NodeBindingComponent } from './node/node-binding/node-binding.component';
+import { NodePublishComponent } from './node/node-publish/node-publish.component';
+import { NodeResourceComponent } from './node/node-resource/node-resource.component';
+import { NodeComponent } from './node/node.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { FooterModule } from './shared/footer/footer.module';
 import { NavbarModule } from './shared/navbar/navbar.module';
@@ -25,15 +40,8 @@ import { TablesComponent } from './tables/tables.component';
 import { TypographyComponent } from './typography/typography.component';
 import { UpgradeComponent } from './upgrade/upgrade.component';
 import { UserComponent } from './user/user.component';
-import { ModalService } from 'app/shared/modal-service';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { BangumiComponent } from './bangumi/bangumi.component';
-import { BangumiEditComponent } from './bangumi/bangumi-edit/bangumi-edit.component';
-import { AnimeComponent } from './anime/anime.component';
-import { AnimeImportComponent } from './anime/anime-import/anime-import.component';
-import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
-import { NodeComponent } from './node/node.component';
-import { NodeResourceComponent } from './node/node-resource/node-resource.component';
+import { LoadingService } from './shared/loading-service';
+import { RouterService } from './shared/router-service';
 
 export function getRemoteServiceBaseUrl(): string {
   return AppConsts.appBaseUrl;
@@ -57,11 +65,15 @@ export function getRemoteServiceBaseUrl(): string {
     AnimeImportComponent,
     AnimeDetailComponent,
     NodeComponent,
-    NodeResourceComponent
+    NodeResourceComponent,
+    NodeBindingComponent,
+    NodePublishComponent
   ],
   imports: [
     NgxCoolDialogsModule.forRoot(),
     ModalModule.forRoot(),
+    SortablejsModule.forRoot({ animation: 150 }),
+    NgxLoadingModule.forRoot({}),
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
@@ -73,16 +85,22 @@ export function getRemoteServiceBaseUrl(): string {
     AppRoutingModule,
     LbdModule,
     HttpClientModule,
-    ServiceProxyModule
+    ServiceProxyModule,
+    TreeModule,
+    SelectDropDownModule
   ],
   providers: [
     ModalService,
+    LoadingService,
+    RouterService,
     { provide: API_BASE_URL, useFactory: getRemoteServiceBaseUrl }
   ],
   bootstrap: [AppComponent],
   entryComponents: [
     BangumiEditComponent,
-    AnimeImportComponent
+    AnimeImportComponent,
+    NodeBindingComponent,
+    NodePublishComponent
   ]
 })
 export class AppModule { }

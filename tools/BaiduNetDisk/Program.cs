@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BaiduNetDisk
 {
@@ -9,8 +12,33 @@ namespace BaiduNetDisk
     {
         private static void Main(string[] args)
         {
-            BaiduNetDisk.GetDirFiles("/test");
+            var path = Path.GetDirectoryName("E:\\");
+            Console.WriteLine(path);
             Console.ReadLine();
+            // BaiduNetDisk.GetDirFiles("/test");
+            //            var dic = new Dictionary<string, Task>();
+            //            var task = new Task(async () =>
+            //            {
+            //                for (int i = 0; i < 5; i++)
+            //                {
+            //                    await Task.Delay(1000);
+            //                    Console.WriteLine($"ThreadId: {Task.CurrentId}");
+            //                }
+            //                dic.Remove("123");
+            //            });
+            //            dic.Add("123", task);
+            //            task.Start();
+            //
+            //            for (;;)
+            //            {
+            //                Thread.Sleep(1000);
+            //                Console.WriteLine($"Count: {dic.Count}");
+            //
+            //                if (dic.Count == 0)
+            //                {
+            //
+            //                }
+            //            }
         }
     }
 

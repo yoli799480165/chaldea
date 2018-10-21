@@ -49,7 +49,7 @@ namespace Chaldea.Node.Services
                 .OrderBy(x => x.Name).ToList();
             var files = dir.GetFiles().Select(x => new DirFileInfo
             {
-                ModifyTime = x.LastWriteTime, Name = x.Name, Size = FileHelper.GetSize(x.Length), FullName = x.FullName,
+                ModifyTime = x.LastWriteTime, Name = x.Name, Size = FileHelper.GetSize(x.Length), Length = x.Length, FullName = x.FullName,
                 Type = DirFileType.File
             }).ToList();
             list.AddRange(files);
@@ -110,6 +110,7 @@ namespace Chaldea.Node.Services
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex.ToString());
                     sb.AppendLine(ex.Message);
                 }
 
