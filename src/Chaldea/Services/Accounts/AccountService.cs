@@ -1,29 +1,30 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Chaldea.IdentityServer.Core;
-using Chaldea.IdentityServer.Repositories;
-using Chaldea.IdentityServer.Utilities;
+using Chaldea.Core.Repositories;
+using Chaldea.Core.Sms;
+using Chaldea.Core.Utilities;
+using Chaldea.Services.Accounts.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
-namespace Chaldea.IdentityServer.Controllers.Accounts
+namespace Chaldea.Services.Accounts
 {
     [Route("api/account")]
-    public class AccountController : ControllerBase
+    public class AccountService : ServiceBase
     {
-        private readonly ILogger<AccountController> _logger;
-        private readonly SmsService _smsService;
+        private readonly ILogger<AccountService> _logger;
+        private readonly SmsManager _smsManager;
         private readonly IRepository<string, User> _userRepository;
 
-        public AccountController(
-            ILogger<AccountController> logger,
-            SmsService smsService,
+        public AccountService(
+            ILogger<AccountService> logger,
+            SmsManager smsManager,
             IRepository<string, User> userRepository)
         {
             _logger = logger;
-            _smsService = smsService;
+            _smsManager = smsManager;
             _userRepository = userRepository;
         }
 
@@ -40,9 +41,6 @@ namespace Chaldea.IdentityServer.Controllers.Accounts
             var code = new Random().Next(1000, 9999).ToString();
             HttpContext.Session.SetString("code", code);
             _logger.LogInformation($"PhoneNumber: {phoneNumber}, Verification code: {code}");
-#if !DEBUG
-            _smsService.SendCode(phoneNumber, code);
-#endif
         }
 
         [Route("register")]
@@ -72,11 +70,11 @@ namespace Chaldea.IdentityServer.Controllers.Accounts
 
             var user = new User
             {
-                Id = ObjectId.GenerateNewId().ToString(),
+                Id = Guid.NewGuid().ToString("N"),
                 PhoneNumber = input.PhoneNumber,
                 Email = string.Empty,
                 Name = string.Empty,
-                Role = Roles.User,
+                Role = nameof(UserRoles.Human),
                 Password = Md5Helper.Md5(input.Password),
                 IsActive = true
             };

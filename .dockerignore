@@ -12,3 +12,4 @@ test
 samples
 docker-compose**/bin
 */obj
+src/Chaldea/app

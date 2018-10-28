@@ -48,9 +48,32 @@
                     text-align: center;
                     cursor: pointer;
                     margin-bottom: 10px;
+                    color: #000;
+                    i {
+                        display: none;
+                    }
                 }
                 a.item:hover {
                     border: 1px solid #ff709e;
+                    color: #ff709e;
+                    i {
+                        display: inline;
+                    }
+                }
+                a.plus {
+                    width: 80px;
+                    height: 25px;
+                    line-height: 23px;
+                    border: 1px dashed #e4e4e4;
+                    border-radius: 5px;
+                    margin-right: 10px;
+                    text-align: center;
+                    cursor: pointer;
+                    margin-bottom: 10px;
+                    color: #e4e4e4;
+                }
+                a.plus:hover {
+                    border: 1px dashed #ff709e;
                     color: #ff709e;
                 }
             }

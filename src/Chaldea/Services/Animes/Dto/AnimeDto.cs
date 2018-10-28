@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Chaldea.Repositories;
+using Chaldea.Core.Repositories;
 
 namespace Chaldea.Services.Animes.Dto
 {

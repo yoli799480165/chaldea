@@ -1,4 +1,4 @@
-import { Component, OnInit, Injector } from '@angular/core';
+import { Component, OnInit, Injector, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { BangumiEditDto, BangumiServiceProxy } from '../../../shared/service-proxies/service-proxies';
 import { ComponentBase } from '../../shared/component-base';
 

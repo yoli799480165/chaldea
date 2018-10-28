@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
-using Chaldea.Repositories;
 using Chaldea.Services.Bangumis.Dto;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 namespace Chaldea.Services.Bangumis
 {
@@ -142,8 +144,8 @@ namespace Chaldea.Services.Bangumis
             if (input == null)
                 throw new UserFriendlyException($"Invalid parameter {nameof(input)}");
 
-            if (string.IsNullOrEmpty(input.Url))
-                throw new UserFriendlyException($"Invalid parameter {nameof(input.Url)}");
+            if (string.IsNullOrEmpty(input.Resource))
+                throw new UserFriendlyException($"Invalid parameter {nameof(input.Resource)}");
 
             _logger.LogInformation($"Begin to import, begin date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
@@ -159,63 +161,79 @@ namespace Chaldea.Services.Bangumis
             if (input.Clear) bangumi.Animes.Clear();
 
             var animeList = new List<Anime>();
-            var webClient = new WebClient();
-            var web = new HtmlWeb();
-            var baseUrl = new Uri(input.Url).GetLeftPart(UriPartial.Authority);
-            var animeListPage = web.Load(input.Url);
-            var animeListNodes = animeListPage.DocumentNode.SelectNodes("//div[@class='zt-dh adj2']/ul/li/p/a/img");
-            var animeDetailUrls = new Dictionary<string, string>();
-            foreach (var animeListNode in animeListNodes)
+
+            if (input.IsFromFile)
             {
-                var href = animeListNode.ParentNode.Attributes["href"].Value;
-                animeDetailUrls.TryAdd(href, $"{baseUrl}{href}");
-            }
-
-            _logger.LogInformation($"Find {animeDetailUrls.Count} resources in total.");
-
-            foreach (var animeDetailUrl in animeDetailUrls)
-            {
-                var animeDetailPage = web.Load(animeDetailUrl.Value);
-                // title
-                var title = animeDetailPage.DocumentNode.SelectSingleNode("//div[@class='anime-img']/h1").InnerText
-                    .Trim();
-
-                // image
-                var imgUrl = animeDetailPage.DocumentNode.SelectSingleNode("//div[@class='anime-img']/img")
-                    .Attributes["src"].Value;
-
-                var downloadUrl = imgUrl.Substring(0, 4).ToLower() == "http" ? imgUrl : $"{baseUrl}{imgUrl}";
-                var imgName = Path.GetFileName(imgUrl);
-                var savePath = $"{imgPath}\\{imgName}";
-                if (!System.IO.File.Exists(savePath))
-                    webClient.DownloadFile(downloadUrl, savePath);
-
-                // desc
-                string desc;
-                var node = animeDetailPage
-                    .DocumentNode.SelectSingleNode("//div[@id='box']/span[@id='showall']");
-                if (node == null)
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "data", input.Resource);
+                if (System.IO.File.Exists(path))
                 {
-                    node = animeDetailPage
-                        .DocumentNode.SelectSingleNode("//div[@id='box']");
-                    desc = node.InnerText.Trim();
+                    var json = System.IO.File.ReadAllText(path);
+                    var animes = JsonConvert.DeserializeObject<List<Anime>>(json);
+                    bangumi.Animes.AddRange(animes.Select(x => x.Id));
+                    animeList.AddRange(animes);
                 }
-                else
+            }
+            else
+            {
+                var webClient = new WebClient();
+                var web = new HtmlWeb();
+                var baseUrl = new Uri(input.Resource).GetLeftPart(UriPartial.Authority);
+                var animeListPage = web.Load(input.Resource);
+                var animeListNodes = animeListPage.DocumentNode.SelectNodes("//div[@class='zt-dh adj2']/ul/li/p/a/img");
+                var animeDetailUrls = new Dictionary<string, string>();
+                foreach (var animeListNode in animeListNodes)
                 {
-                    desc = node.InnerText.Trim();
+                    var href = animeListNode.ParentNode.Attributes["href"].Value;
+                    animeDetailUrls.TryAdd(href, $"{baseUrl}{href}");
                 }
 
-                var anime = new Anime
+                _logger.LogInformation($"Find {animeDetailUrls.Count} resources in total.");
+
+                foreach (var animeDetailUrl in animeDetailUrls)
                 {
-                    Id = Guid.NewGuid().ToString("N"),
-                    Title = title,
-                    Cover = imgName,
-                    Desc = desc
-                };
-                animeList.Add(anime);
-                bangumi.Animes.Add(anime.Id);
-                _logger.LogInformation($"Add anime {anime.Id} to list.");
+                    var animeDetailPage = web.Load(animeDetailUrl.Value);
+                    // title
+                    var title = animeDetailPage.DocumentNode.SelectSingleNode("//div[@class='anime-img']/h1").InnerText
+                        .Trim();
+
+                    // image
+                    var imgUrl = animeDetailPage.DocumentNode.SelectSingleNode("//div[@class='anime-img']/img")
+                        .Attributes["src"].Value;
+
+                    var downloadUrl = imgUrl.Substring(0, 4).ToLower() == "http" ? imgUrl : $"{baseUrl}{imgUrl}";
+                    var imgName = Path.GetFileName(imgUrl);
+                    var savePath = Path.Combine(imgPath, imgName);
+                    if (!System.IO.File.Exists(savePath))
+                        webClient.DownloadFile(downloadUrl, savePath);
+
+                    // desc
+                    string desc;
+                    var node = animeDetailPage
+                        .DocumentNode.SelectSingleNode("//div[@id='box']/span[@id='showall']");
+                    if (node == null)
+                    {
+                        node = animeDetailPage
+                            .DocumentNode.SelectSingleNode("//div[@id='box']");
+                        desc = node.InnerText.Trim();
+                    }
+                    else
+                    {
+                        desc = node.InnerText.Trim();
+                    }
+
+                    var anime = new Anime
+                    {
+                        Id = Guid.NewGuid().ToString("N"),
+                        Title = title,
+                        Cover = imgName,
+                        Desc = desc
+                    };
+                    animeList.Add(anime);
+                    bangumi.Animes.Add(anime.Id);
+                    _logger.LogInformation($"Add anime {anime.Id} to list.");
+                }
             }
+
 
             var filter = Builders<Bangumi>.Filter.Eq("_id", id);
             var update = Builders<Bangumi>.Update.Set("animes", bangumi.Animes);

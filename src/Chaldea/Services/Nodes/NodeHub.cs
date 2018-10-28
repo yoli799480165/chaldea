@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Chaldea.Core.Nodes;
-using Chaldea.Repositories;
+using Chaldea.Core.Repositories;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 

@@ -1,14 +1,15 @@
-﻿using Aliyun.Acs.Core;
+﻿using System.Threading.Tasks;
+using Aliyun.Acs.Core;
 using Aliyun.Acs.Core.Exceptions;
 using Aliyun.Acs.Core.Profile;
 using Aliyun.Acs.Dysmsapi.Model.V20170525;
-using Chaldea.IdentityServer.Seettings;
+using Chaldea.Core.Sms;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Chaldea.IdentityServer.Core
+namespace Chaldea.Infrastructure.Sms.Aliyun
 {
-    public class SmsService
+    public class SmsService : ISmsService
     {
         private readonly ILogger<SmsService> _logger;
         private readonly SmsServiceSettings _options;
@@ -19,7 +20,7 @@ namespace Chaldea.IdentityServer.Core
             _options = options.Value;
         }
 
-        public SendSmsResponse SendCode(string phoneNumber, string code)
+        public Task<SmsResponse> Send(string phoneNumber, string code)
         {
             var profile = DefaultProfile.GetProfile("cn-hangzhou", _options.AccessKeyId, _options.AccessKeySecret);
             DefaultProfile.AddEndpoint("cn-hangzhou", "cn-hangzhou", _options.Product, _options.Domain);
@@ -45,11 +46,14 @@ namespace Chaldea.IdentityServer.Core
             {
                 _logger.LogError(e.ErrorCode, e.ErrorMessage);
             }
-            catch (ClientException e)
+
+            return Task.FromResult(new SmsResponse
             {
-                _logger.LogError(e.ErrorCode, e.ErrorMessage);
-            }
-            return response;
+                RequestId = response.RequestId,
+                BizId = response.BizId,
+                Code = response.Code,
+                Message = response.Message
+            });
         }
     }
 }

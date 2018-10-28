@@ -1,4 +1,4 @@
-﻿namespace Chaldea.IdentityServer.Controllers.Accounts
+﻿namespace Chaldea.Services.Accounts.Dto
 {
     public class RegisterDto
     {

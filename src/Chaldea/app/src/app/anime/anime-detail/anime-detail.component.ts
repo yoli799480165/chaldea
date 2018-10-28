@@ -1,8 +1,14 @@
-import { Component, OnInit, Injector } from '@angular/core';
-import { AnimeServiceProxy, AnimeDto, AnimeTagServiceProxy, AnimeTagDto } from '../../../shared/service-proxies/service-proxies';
-import { ComponentBase } from '../../shared/component-base';
+import { Component, Injector, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
 import { AppConsts } from '../../../shared/AppConsts';
+import {
+  AnimeDto,
+  AnimeServiceProxy,
+  AnimeTagDto,
+  AnimeTagServiceProxy
+} from '../../../shared/service-proxies/service-proxies';
+import { ComponentBase } from '../../shared/component-base';
 
 @Component({
   selector: 'app-anime-detail',
@@ -10,7 +16,7 @@ import { AppConsts } from '../../../shared/AppConsts';
   styleUrls: ['./anime-detail.component.scss']
 })
 export class AnimeDetailComponent extends ComponentBase implements OnInit {
-  coverUrl: string;
+  cover = '';
   anime: AnimeDto = new AnimeDto();
   animeTag: AnimeTagDto = new AnimeTagDto();
 
@@ -21,7 +27,7 @@ export class AnimeDetailComponent extends ComponentBase implements OnInit {
     private animeTagServiceProxy: AnimeTagServiceProxy
   ) {
     super(injector);
-    this.coverUrl = `${AppConsts.appBaseUrl}/statics/imgs/`
+    this.anime.tags = [];
   }
 
   ngOnInit() {
@@ -32,6 +38,7 @@ export class AnimeDetailComponent extends ComponentBase implements OnInit {
   getAnime(): void {
     const animeId = this.activeRoute.snapshot.params['animeId'];
     this.animeServiceProxy.getAnime(animeId).subscribe((rep) => {
+      this.cover = `${AppConsts.appBaseUrl}/statics/imgs/${rep.cover}`;
       this.anime = rep;
     });
   }
@@ -55,6 +62,16 @@ export class AnimeDetailComponent extends ComponentBase implements OnInit {
   save(): void {
     this.animeServiceProxy.update(this.anime).subscribe(() => {
       this.showSuccess('保存成功');
+    });
+  }
+
+  removeVideo(sourceId: string): void {
+    this.dialog.confirm('确定删除该资源?').subscribe((confirm) => {
+      if (confirm) {
+        this.animeServiceProxy.removeVideos(this.anime.id, [sourceId]).subscribe(() => {
+          this.getAnime();
+        });
+      }
     });
   }
 }

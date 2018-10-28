@@ -7,7 +7,7 @@
             <div class="list-detail">
               <div class="anime">
                 <div class="cover">
-                  <img [src]="coverUrl + anime.cover" alt="">
+                  <img [src]="cover" alt="">
                 </div>
                 <div class="info">
                   <h4>{{anime.title}}</h4>
@@ -18,7 +18,13 @@
                     剧集：
                   </div>
                   <div class="episode">
-                    <a class="item" *ngFor="let source of anime.animes">{{source}}</a>
+                    <a class="item" *ngFor="let source of anime.videos">
+                      {{source.name}}
+                      <i class="fa fa-times" (click)="removeVideo(source.id)"></i>
+                    </a>
+                    <a class="plus">
+                      <i class="fa fa-plus"></i>
+                    </a>
                   </div>
                 </div>
               </div>

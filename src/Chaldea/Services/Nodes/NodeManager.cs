@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Chaldea.Repositories;
+using Chaldea.Core.Repositories;
 
 namespace Chaldea.Services.Nodes
 {

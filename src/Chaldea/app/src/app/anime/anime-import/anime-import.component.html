@@ -7,12 +7,18 @@
 <div class="modal-body">
   <div class="form-group">
     <label>资源地址:</label>
-    <input type="text" class="form-control" placeholder="资源地址" [(ngModel)]="input.url">
+    <input type="text" class="form-control" placeholder="资源地址或名称" [(ngModel)]="input.resource">
   </div>
 
   <div class="form-group">
     <label>
       <input type="checkbox" [(ngModel)]="input.clear">是否清空番组
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>
+      <input type="checkbox" [(ngModel)]="input.isFromFile">是否来源文件
     </label>
   </div>
 </div>

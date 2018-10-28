@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
-using Chaldea.Repositories;
 using Chaldea.Services.Animes.Dto;
 using Chaldea.Services.Bangumis.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
 namespace Chaldea.Services.Animes
 {
@@ -21,15 +19,18 @@ namespace Chaldea.Services.Animes
 
         private readonly IRepository<string, Bangumi> _bangumiRepository;
         private readonly ILogger<AnimeService> _logger;
+        private readonly IRepository<string, Video> _videoRepository;
 
         public AnimeService(
             ILogger<AnimeService> logger,
             IRepository<string, Anime> animeRepository,
-            IRepository<string, Bangumi> bangumiRepository)
+            IRepository<string, Bangumi> bangumiRepository,
+            IRepository<string, Video> videoRepository)
         {
             _logger = logger;
             _animeRepository = animeRepository;
             _bangumiRepository = bangumiRepository;
+            _videoRepository = videoRepository;
         }
 
         [Route("getList")]
@@ -40,13 +41,15 @@ namespace Chaldea.Services.Animes
             {
                 if (string.IsNullOrEmpty(bangumiId))
                 {
-                    ICollection<Anime> list;
+                    var projection = Builders<Anime>.Projection.Include(x => x.Id).Include(x => x.Title)
+                        .Include(x => x.Cover);
+                    ICollection<AnimeOutlineDto> list;
                     if (skip >= 0 && take > 0)
-                        list = await _animeRepository.GetAll().Skip(skip).Limit(take).ToListAsync();
+                        list = await _animeRepository.GetAll().Skip(skip).Limit(take).Project<AnimeOutlineDto>(projection).ToListAsync();
                     else
-                        list = await _animeRepository.GetAll().ToListAsync();
+                        list = await _animeRepository.GetAll().Project<AnimeOutlineDto>(projection).ToListAsync();
 
-                    return Mapper.Map<ICollection<AnimeOutlineDto>>(list);
+                    return list;
                 }
 
                 var stages = new List<string>
@@ -109,113 +112,16 @@ namespace Chaldea.Services.Animes
                 throw;
             }
         }
-    }
 
-    public class AddResourceDto
-    {
-        public string AnimeId { get; set; }
-
-        public SourceType SourceType { get; set; }
-
-        // public List<Resource> Resources { get; set; }
-    }
-
-    public enum SourceType
-    {
-        Anime = 0,
-        Comic = 1,
-        Novel = 2
-    }
-
-    public class ObjectIdConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
+        [Route("{id}/removeVideos")]
+        [HttpDelete]
+        public async Task RemoveVideos(string id, [FromBody] ICollection<string> resources)
         {
-            return objectType == typeof(ObjectId);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-            JsonSerializer serializer)
-        {
-            if (reader.TokenType != JsonToken.String)
-                throw new Exception($"Unexpected token parsing ObjectId. Expected String, got {reader.TokenType}.");
-
-            var value = (string) reader.Value;
-            return string.IsNullOrEmpty(value) ? ObjectId.Empty : new ObjectId(value);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            if (value is ObjectId)
-            {
-                var objectId = (ObjectId) value;
-                writer.WriteValue(objectId != ObjectId.Empty ? objectId.ToString() : string.Empty);
-            }
-            else
-            {
-                throw new Exception("Expected ObjectId value.");
-            }
+            var filter = Builders<Anime>.Filter.Eq(x => x.Id, id);
+            var update = Builders<Anime>.Update.PullFilter(x => x.Videos, y => resources.Contains(y.Id));
+            await _animeRepository.UpdateAsync(filter, update);
+//            var delete = Builders<Video>.Filter.In(x => x.Id, resources);
+//            await _videoRepository.DeleteManyAsync(delete);
         }
     }
 }
-
-//
-//        [Route("getlist")]
-//        [HttpGet]
-//        public async Task<ICollection<Anime>> GetList(string bangumiId, int skip, int take)
-//        {
-//            if (skip == 0 && take == 0) return (await _bangumiRepository.GetAsync(bangumiId)).Animes;
-//            var query = Builders<Bangumi>.Projection.Slice(x => x.Animes, skip, take);
-//            var bangumi = await _bangumiRepository
-//                .GetAll(x => x.Id == bangumiId)
-//                .Project<Bangumi>(query).FirstOrDefaultAsync();
-//            return bangumi.Animes;
-//        }
-//
-//        [Route("{bangumiId}/update")]
-//        [HttpPost]
-//        public async Task Update(string bangumiId, [FromBody] Anime input)
-//        {
-//            var filter = Builders<Bangumi>.Filter.Eq("_id", RepositoryHelper.GetInternalId(bangumiId)) &
-//                         Builders<Bangumi>.Filter.Eq("animes._id", RepositoryHelper.GetInternalId(input.Id));
-//            var update = Builders<Bangumi>.Update.Set("animes.$", input);
-//            await _bangumiRepository.UpdateAsync(filter, update);
-//        }
-//
-//        [Route("getdetail")]
-//        [HttpGet]
-//        public async Task<AnimeDetail> GetDetail(string animeId)
-//        {
-//            return await _animeDetailRepository.GetAsync(x => x.AnimeId == animeId);
-//        }
-//
-//        [Route("addresource")]
-//        [HttpPut]
-//        public async Task AddResource([FromBody] AddResourceDto input)
-//        {
-//            foreach (var source in input.Resources) source.Uid = Guid.NewGuid().ToString("N");
-//
-//            var filter = Builders<AnimeDetail>
-//                .Filter.Eq(e => e.AnimeId, input.AnimeId);
-//            var update = input.SourceType == SourceType.Anime
-//                ? Builders<AnimeDetail>.Update.PushEach(x => x.Animes, input.Resources)
-//                : input.SourceType == SourceType.Comic
-//                    ? Builders<AnimeDetail>.Update.PushEach(x => x.Comics, input.Resources)
-//                    : Builders<AnimeDetail>.Update.PushEach(x => x.Novels, input.Resources);
-//
-//            await _animeDetailRepository.UpdateAsync(filter, update);
-//        }
-//
-//        [Route("updateDetail")]
-//        [HttpPost]
-//        public async Task UpdateDetail([FromBody] AnimeDetail input)
-//        {
-//            if (input == null) throw new Exception($"Invalid param {nameof(input)}");
-//            if (_animeDetailRepository.GetAsync(input.Id) == null)
-//                throw new Exception($"The id {input.Id} not exists.");
-//            foreach (var anime in input.Animes)
-//                if (string.IsNullOrEmpty(anime.Uid))
-//                    anime.Uid = Guid.NewGuid().ToString("N");
-//
-//            await _animeDetailRepository.UpdateAsync(input);
-//        }

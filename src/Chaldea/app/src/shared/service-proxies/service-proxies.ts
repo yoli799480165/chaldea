@@ -195,6 +195,58 @@ export class AnimeServiceProxy {
         }
         return Observable.of<void>(<any>null);
     }
+
+    /**
+     * @resources (optional) 
+     * @return Success
+     */
+    removeVideos(id: string, resources: string[] | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/anime/{id}/removeVideos";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(resources);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
+            return this.processRemoveVideos(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processRemoveVideos(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processRemoveVideos(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
 }
 
 @Injectable()
@@ -1764,7 +1816,8 @@ export interface IBangumiAnimesDto {
 
 export class ImportBangumiDto implements IImportBangumiDto {
     clear: boolean | undefined;
-    url: string | undefined;
+    isFromFile: boolean | undefined;
+    resource: string | undefined;
 
     constructor(data?: IImportBangumiDto) {
         if (data) {
@@ -1778,7 +1831,8 @@ export class ImportBangumiDto implements IImportBangumiDto {
     init(data?: any) {
         if (data) {
             this.clear = data["clear"];
-            this.url = data["url"];
+            this.isFromFile = data["isFromFile"];
+            this.resource = data["resource"];
         }
     }
 
@@ -1791,14 +1845,16 @@ export class ImportBangumiDto implements IImportBangumiDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["clear"] = this.clear;
-        data["url"] = this.url;
+        data["isFromFile"] = this.isFromFile;
+        data["resource"] = this.resource;
         return data; 
     }
 }
 
 export interface IImportBangumiDto {
     clear: boolean | undefined;
-    url: string | undefined;
+    isFromFile: boolean | undefined;
+    resource: string | undefined;
 }
 
 export class Banner implements IBanner {

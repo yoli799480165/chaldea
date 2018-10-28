@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
-using Chaldea.Repositories;
 using Chaldea.Services.AnimeTags.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

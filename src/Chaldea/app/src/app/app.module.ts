@@ -42,6 +42,7 @@ import { TablesComponent } from './tables/tables.component';
 import { TypographyComponent } from './typography/typography.component';
 import { UpgradeComponent } from './upgrade/upgrade.component';
 import { UserComponent } from './user/user.component';
+import { ExtractFileComponent } from './node/node-resource/extract-file/extract-file.component';
 
 export function getRemoteServiceBaseUrl(): string {
   return AppConsts.appBaseUrl;
@@ -67,7 +68,8 @@ export function getRemoteServiceBaseUrl(): string {
     NodeComponent,
     NodeResourceComponent,
     NodeBindingComponent,
-    NodePublishComponent
+    NodePublishComponent,
+    ExtractFileComponent
   ],
   imports: [
     NgxCoolDialogsModule.forRoot(),
@@ -100,7 +102,8 @@ export function getRemoteServiceBaseUrl(): string {
     BangumiEditComponent,
     AnimeImportComponent,
     NodeBindingComponent,
-    NodePublishComponent
+    NodePublishComponent,
+    ExtractFileComponent
   ]
 })
 export class AppModule { }

@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.Node", "src\Chaldea
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chaldea.Core", "src\Chaldea.Core\Chaldea.Core.csproj", "{51477E48-33C3-499A-99BB-EEF7BAADF511}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaiduNetDisk", "tools\BaiduNetDisk\BaiduNetDisk.csproj", "{0C6B1CAF-66A8-4223-AC30-39A31B1F3158}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaiduNetDisk", "tools\BaiduNetDisk\BaiduNetDisk.csproj", "{0C6B1CAF-66A8-4223-AC30-39A31B1F3158}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaldea.Infrastructure.Sms.Aliyun", "src\Chaldea.Infrastructure.Sms.Aliyun\Chaldea.Infrastructure.Sms.Aliyun.csproj", "{8257AFE1-5B49-46A5-91DC-D7005E35DB99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{0C6B1CAF-66A8-4223-AC30-39A31B1F3158}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C6B1CAF-66A8-4223-AC30-39A31B1F3158}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C6B1CAF-66A8-4223-AC30-39A31B1F3158}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8257AFE1-5B49-46A5-91DC-D7005E35DB99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8257AFE1-5B49-46A5-91DC-D7005E35DB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8257AFE1-5B49-46A5-91DC-D7005E35DB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8257AFE1-5B49-46A5-91DC-D7005E35DB99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{72463BE8-6903-485E-B022-1032CCD14CC8} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 		{51477E48-33C3-499A-99BB-EEF7BAADF511} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 		{0C6B1CAF-66A8-4223-AC30-39A31B1F3158} = {230C5673-DEA7-4E80-82C3-E79FD7CE1BE2}
+		{8257AFE1-5B49-46A5-91DC-D7005E35DB99} = {863C17D6-06EA-4B30-8549-4F571FBF93BF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8FB94BA5-79C6-45F9-9972-8118990A9522}

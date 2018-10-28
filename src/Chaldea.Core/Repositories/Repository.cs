@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace Chaldea.IdentityServer.Repositories
+namespace Chaldea.Core.Repositories
 {
     public class Repository<TKey, TEntity> : IRepository<TKey, TEntity>
         where TEntity : class, IEntity<TKey>, new()
@@ -42,10 +42,16 @@ namespace Chaldea.IdentityServer.Repositories
             await _db.DeleteOneAsync(x => x.Id.Equals(id));
         }
 
+        public async Task<long> DeleteManyAsync(FilterDefinition<TEntity> filter)
+        {
+            var result = await _db.DeleteManyAsync(filter);
+            return result.DeletedCount;
+        }
+
         public async Task<long> CountAsync(Expression<Func<TEntity, bool>> predicate,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await _db.CountAsync(predicate, cancellationToken: cancellationToken);
+            return await _db.CountDocumentsAsync(predicate, cancellationToken: cancellationToken);
         }
 
         public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
@@ -89,5 +95,16 @@ namespace Chaldea.IdentityServer.Repositories
         {
             return _db.Find(predicate ?? (_ => true));
         }
+
+        public IFindFluent<TEntity, TEntity> GetAll(FilterDefinition<TEntity> filter)
+        {
+            return _db.Find(filter);
+        }
+
+        public IAsyncCursor<TResult> Aggregate<TResult>(PipelineDefinition<TEntity, TResult> pipeline)
+        {
+            return _db.Aggregate(pipeline);
+        }
+        
     }
 }

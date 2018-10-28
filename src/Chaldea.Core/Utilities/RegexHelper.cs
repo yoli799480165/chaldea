@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Chaldea.IdentityServer.Utilities
+namespace Chaldea.Core.Utilities
 {
     public static class RegexHelper
     {

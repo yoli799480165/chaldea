@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using Chaldea.IdentityServer.Repositories;
-using Chaldea.IdentityServer.Utilities;
+using Chaldea.Core.Repositories;
+using Chaldea.Core.Utilities;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;

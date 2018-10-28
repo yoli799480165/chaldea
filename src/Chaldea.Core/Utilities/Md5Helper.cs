@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Chaldea.IdentityServer.Utilities
+namespace Chaldea.Core.Utilities
 {
     public static class Md5Helper
     {

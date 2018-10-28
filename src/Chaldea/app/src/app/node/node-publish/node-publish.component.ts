@@ -49,7 +49,7 @@ export class NodePublishComponent extends ComponentBase implements OnInit {
         const items = <PublishDirFileInfo[]>this.modal.data.selectDirFiles.map((x, index) => {
           const item = new PublishDirFileInfo();
           item.displayName = this.getDisplayName(this.displayFormat, index);
-          item.url = `${this.urlPrefix}/${item.name}`;
+          item.url = `${this.urlPrefix}/${x.name}`;
           item.fullName = x.fullName;
           item.length = x.length;
           item.modifyTime = x.modifyTime;
@@ -99,7 +99,7 @@ export class NodePublishComponent extends ComponentBase implements OnInit {
   }
 
   getDisplayName(displayFormat: string, index: number): string {
-    const num = +displayFormat.match(/\d/g);
-    return displayFormat.replace(/{\d}/g, (index + num + 1).toString().padStart(2, '0'));
+    const num = +displayFormat.match(/\d+/g);
+    return displayFormat.replace(/{\d+}/g, (index + num + 1).toString().padStart(2, '0'));
   }
 }

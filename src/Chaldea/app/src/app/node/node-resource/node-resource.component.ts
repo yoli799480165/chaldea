@@ -3,6 +3,7 @@ import { NodeServiceProxy, Node, GetDirFileDto, DirFileInfo, ExtractFileDto, Syn
 import { ComponentBase } from 'app/shared/component-base';
 import { NodeBindingComponent } from '../node-binding/node-binding.component';
 import { NodePublishComponent } from '../node-publish/node-publish.component';
+import { ExtractFileComponent } from './extract-file/extract-file.component';
 
 @Component({
   selector: 'app-node-resource',
@@ -17,6 +18,7 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
   selectPath = '';
   selectDirFiles: DirFileInfo[] = [];
   syncDirs: SyncDirectory[] = [];
+  allChecked = false;
 
   constructor(
     private injector: Injector,
@@ -48,6 +50,7 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
   }
 
   getDirFiles(): void {
+    this.allChecked = false;
     this.selectDirFiles = [];
     const input = new GetDirFileDto();
     input.path = this.selectPath;
@@ -112,6 +115,9 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
       item['checked'] = $event.target.checked;
       if ($event.target.checked) {
         this.selectDirFiles.push(item);
+      } else {
+        const index = this.selectDirFiles.indexOf(item);
+        this.selectDirFiles.splice(index, 1);
       }
     });
   }
@@ -142,16 +148,13 @@ export class NodeResourceComponent extends ComponentBase implements OnInit {
 
   extractFiles(): void {
     if (this.selectDirFiles.length > 0) {
-      const extractParams = new ExtractFileDto();
-      extractParams.files = this.selectDirFiles;
-      extractParams.destDir = this.selectPath;
-      extractParams.password = '';
-      this.nodeServiceProxy.extractFiles(this.selectedNode.id, extractParams).subscribe((msg) => {
-        this.getDirFiles();
-        if (msg && msg !== '') {
-          this.dialog.alert(msg);
-        }
-      });
+      this.modal.show(ExtractFileComponent, { nodeId: this.selectedNode.id, files: this.selectDirFiles, destDir: this.selectPath })
+        .subscribe((msg) => {
+          this.getDirFiles();
+          if (msg && msg !== '') {
+            this.dialog.alert(msg);
+          }
+        });
     } else {
       this.dialog.alert('请选择压缩文件.');
     }

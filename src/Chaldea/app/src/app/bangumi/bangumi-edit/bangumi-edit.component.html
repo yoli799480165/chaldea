@@ -7,7 +7,7 @@
 <div class="modal-body">
   <div class="form-group">
     <label>名称:</label>
-    <input type="text" class="form-control" placeholder="名称" [(ngModel)]="input.name">
+    <input type="text" class="form-control" placeholder="名称" [(ngModel)]="input.name" (keyup.enter)="save()">
   </div>
 </div>
 <div class="modal-footer">

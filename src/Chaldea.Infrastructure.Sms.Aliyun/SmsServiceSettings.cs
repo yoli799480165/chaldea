@@ -1,4 +1,4 @@
-﻿namespace Chaldea.IdentityServer.Seettings
+﻿namespace Chaldea.Infrastructure.Sms.Aliyun
 {
     public class SmsServiceSettings
     {

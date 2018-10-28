@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using Chaldea.Repositories;
-using Chaldea.Seettings;
+using Chaldea.Core;
+using Chaldea.Infrastructure.Sms.Aliyun;
 using Chaldea.Services;
 using Chaldea.Services.Nodes;
 using Microsoft.AspNetCore.Builder;
@@ -26,7 +26,6 @@ namespace Chaldea
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDB"));
             services.AddCors(options =>
             {
                 options.AddPolicy(DefaultCorsPolicyName, builder =>
@@ -53,13 +52,11 @@ namespace Chaldea
                     options.ApiName = "api1";
                 });
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
-
+            services.AddDataProvider(Configuration.GetSection("MongoDB"));
+            services.AddSms(cfg => { cfg.Config = Configuration.GetSection("SmsService"); });
             services.AddSingleton<EventManager>();
             services.AddSingleton<NodeManager>();
-            services.AddTransient<ChaldeaDbContext>();
-            services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
-            services.AddScoped<NodeProxy>();
-
+            services.AddSingleton<NodeProxy>();
             Mappings.Initialize();
         }
 

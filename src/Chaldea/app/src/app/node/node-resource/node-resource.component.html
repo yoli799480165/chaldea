@@ -48,7 +48,7 @@
                 <thead>
                   <tr>
                     <th class="check">
-                      <input type="checkbox" (change)="checkAll($event)">
+                      <input type="checkbox" [(ngModel)]="allChecked" (change)="checkAll($event)">
                     </th>
                     <th>
                       文件名

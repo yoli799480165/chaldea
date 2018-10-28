@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace Chaldea.Repositories
+namespace Chaldea.Core.Repositories
 {
     public class RepositoryHelper
     {

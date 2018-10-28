@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace Chaldea.Repositories
+namespace Chaldea.Core.Repositories
 {
     public interface IEntity<T>
     {
@@ -23,6 +23,8 @@ namespace Chaldea.Repositories
         Task UpdateAsync(TEntity entity);
 
         Task DeleteAsync(TKey id);
+
+        Task<long> DeleteManyAsync(FilterDefinition<TEntity> filter);
 
         Task<long> CountAsync(Expression<Func<TEntity, bool>> predicate,
             CancellationToken cancellationToken = default(CancellationToken));

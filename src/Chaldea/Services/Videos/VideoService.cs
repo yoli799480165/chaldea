@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
+using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
-using Chaldea.Repositories;
 using Chaldea.Services.Videos.Dto;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using Chaldea.IdentityServer.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using Chaldea.Core.Repositories;
+using Chaldea.Core.Utilities;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
-using MongoDB.Bson;
 
 namespace Chaldea.IdentityServer.Configuration
 {
@@ -22,7 +23,7 @@ namespace Chaldea.IdentityServer.Configuration
         {
             return new List<ApiResource>
             {
-                new ApiResource("api1", "My API", new List<string>{JwtClaimTypes.Role})
+                new ApiResource("api1", "My API", new List<string> {JwtClaimTypes.Role})
             };
         }
 
@@ -88,7 +89,7 @@ namespace Chaldea.IdentityServer.Configuration
             {
                 new User
                 {
-                    Id = ObjectId.GenerateNewId().ToString(),
+                    Id = Guid.NewGuid().ToString("N"),
                     Name = "admin",
                     PhoneNumber = "",
                     Address = "Address",
@@ -97,24 +98,9 @@ namespace Chaldea.IdentityServer.Configuration
                     FamilyName = "admin",
                     GivenName = "admin",
                     IsActive = true,
-                    Password = "123456",
+                    Password = Md5Helper.Md5("123qwe"),
                     WebSite = "WebSite",
-                    Role = Roles.Admin
-                },
-                new User
-                {
-                    Id = ObjectId.GenerateNewId().ToString(),
-                    Name = "test",
-                    PhoneNumber = "",
-                    Address = "Address",
-                    Email = "test@chaldea.cn",
-                    EmailVerified = true,
-                    FamilyName = "test",
-                    GivenName = "test",
-                    IsActive = true,
-                    Password = "123456",
-                    WebSite = "WebSite",
-                    Role = Roles.User
+                    Role = nameof(UserRoles.Admin)
                 }
             };
         }
