@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
@@ -10,7 +10,8 @@ import { ModalService } from 'app/shared/modal-service';
 import { DictionaryPipe } from 'app/shared/pipes/dictionary.pipe';
 import { SafeHtmlPipe } from 'app/shared/pipes/safe-html.pipe';
 import { TreeModule } from 'ng2-tree';
-import { ModalModule } from 'ngx-bootstrap';
+import { BsDatepickerModule, ModalModule, TimepickerModule } from 'ngx-bootstrap';
+import { ClipboardModule } from 'ngx-clipboard';
 import { NgxCoolDialogsModule } from 'ngx-cool-dialogs';
 import { NgxLoadingModule } from 'ngx-loading';
 import { SelectDropDownModule } from 'ngx-select-dropdown';
@@ -18,6 +19,7 @@ import { AppConsts } from 'shared/AppConsts';
 import { ServiceProxyModule } from 'shared/service-proxies/service-proxy.module';
 
 import { API_BASE_URL } from '../shared/service-proxies/service-proxies';
+import { LoginComponent } from './account/login/login.component';
 import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
 import { AnimeImportComponent } from './anime/anime-import/anime-import.component';
 import { AnimeComponent } from './anime/anime.component';
@@ -30,26 +32,26 @@ import { IconsComponent } from './icons/icons.component';
 import { LbdModule } from './lbd/lbd.module';
 import { NodeBindingComponent } from './node/node-binding/node-binding.component';
 import { NodePublishComponent } from './node/node-publish/node-publish.component';
+import { ExtractFileComponent } from './node/node-resource/extract-file/extract-file.component';
 import { NodeResourceComponent } from './node/node-resource/node-resource.component';
 import { NodeComponent } from './node/node.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { FooterModule } from './shared/footer/footer.module';
+import { ChaldeaHttpInterceptor } from './shared/http-interceptor';
+import { LayoutComponent } from './shared/layout/layout.component';
 import { LoadingService } from './shared/loading-service';
 import { NavbarModule } from './shared/navbar/navbar.module';
 import { RouterService } from './shared/router-service';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { TablesComponent } from './tables/tables.component';
+import { TimetableEditComponent } from './timetable/timetable-edit/timetable-edit.component';
+import { TimetableComponent } from './timetable/timetable.component';
 import { TypographyComponent } from './typography/typography.component';
 import { UpgradeComponent } from './upgrade/upgrade.component';
 import { UserComponent } from './user/user.component';
-import { ExtractFileComponent } from './node/node-resource/extract-file/extract-file.component';
-import { LoginComponent } from './account/login/login.component';
-import { LayoutComponent } from './shared/layout/layout.component';
-import { TimetableComponent } from './timetable/timetable.component';
-import { TimetableEditComponent } from './timetable/timetable-edit/timetable-edit.component';
-import { BsDatepickerModule } from 'ngx-bootstrap';
-import { TimepickerModule } from 'ngx-bootstrap';
-import { ClipboardModule } from 'ngx-clipboard';
+import { LoginService } from './account/login/login.service';
+import { TokenService } from './shared/token.service';
+import { UserEditComponent } from './user/user-edit/user-edit.component';
 
 export function getRemoteServiceBaseUrl(): string {
   return AppConsts.appBaseUrl;
@@ -80,7 +82,8 @@ export function getRemoteServiceBaseUrl(): string {
     ExtractFileComponent,
     LoginComponent,
     TimetableComponent,
-    TimetableEditComponent
+    TimetableEditComponent,
+    UserEditComponent
   ],
   imports: [
     NgxCoolDialogsModule.forRoot(),
@@ -106,10 +109,13 @@ export function getRemoteServiceBaseUrl(): string {
     ClipboardModule
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: ChaldeaHttpInterceptor, multi: true },
+    { provide: API_BASE_URL, useFactory: getRemoteServiceBaseUrl },
+    TokenService,
+    LoginService,
     ModalService,
     LoadingService,
-    RouterService,
-    { provide: API_BASE_URL, useFactory: getRemoteServiceBaseUrl }
+    RouterService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
@@ -118,7 +124,8 @@ export function getRemoteServiceBaseUrl(): string {
     NodeBindingComponent,
     NodePublishComponent,
     ExtractFileComponent,
-    TimetableEditComponent
+    TimetableEditComponent,
+    UserEditComponent
   ]
 })
 export class AppModule { }

@@ -13,6 +13,7 @@ import { NodePublishComponent } from './node/node-publish/node-publish.component
 import { LoginComponent } from './account/login/login.component';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { TimetableComponent } from './timetable/timetable.component';
+import { UserComponent } from './user/user.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -28,7 +29,7 @@ const routes: Routes = [
       { path: 'node-resource', component: NodeResourceComponent },
       { path: 'node-publish/:key', component: NodePublishComponent },
       { path: 'timetable', component: TimetableComponent },
-      { path: 'notifications', component: NotificationsComponent },
+      { path: 'user', component: UserComponent },
       { path: 'upgrade', component: UpgradeComponent }
     ]
   },

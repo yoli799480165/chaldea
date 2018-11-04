@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson.Serialization.Conventions;
 
 namespace Chaldea.IdentityServer
 {
@@ -8,6 +9,8 @@ namespace Chaldea.IdentityServer
     {
         public static void Main(string[] args)
         {
+            var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
+            ConventionRegistry.Register("camelCase", conventionPack, t => true);
             CreateWebHostBuilder(args).Build().Run();
         }
 

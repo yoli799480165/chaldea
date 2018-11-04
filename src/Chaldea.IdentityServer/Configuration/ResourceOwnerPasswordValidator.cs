@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Chaldea.Core.Repositories;
 using Chaldea.Core.Utilities;
@@ -35,14 +36,15 @@ namespace Chaldea.IdentityServer.Configuration
         //可以根据需要设置相应的Claim
         private Claim[] GetUserClaims(User user)
         {
-            return new[]
+            var list = new List<Claim>
             {
                 new Claim("userId", user.Id),
                 new Claim(JwtClaimTypes.Name, user.Name),
-                new Claim(JwtClaimTypes.Email, user.Email),
                 new Claim(JwtClaimTypes.PhoneNumber, user.PhoneNumber),
                 new Claim(JwtClaimTypes.Role, user.Role)
             };
+            if (user.Email != null) list.Add(new Claim(JwtClaimTypes.Email, user.Email));
+            return list.ToArray();
         }
     }
 }

@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">添加/编辑用户</h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="form-group">
+    <label>角色:</label>
+    <select class="form-control" [(ngModel)]="selectRole">
+      <option *ngFor="let role of roles" [ngValue]="role">{{role.text}}</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>手机号码:</label>
+    <input type="text" class="form-control" placeholder="手机号码" [(ngModel)]="input.phoneNumber">
+  </div>
+
+  <div class="form-group">
+    <label>用户名称:</label>
+    <input type="text" class="form-control" placeholder="用户名称" [(ngModel)]="input.name">
+  </div>
+
+  <div class="form-group">
+    <label>
+      <input type="checkbox" [(ngModel)]="input.isActive">是否启用
+    </label>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-info btn-fill" (click)="save()">保存</button>
+</div>

@@ -9,6 +9,7 @@ using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
 using Chaldea.Services.Bangumis.Dto;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -34,6 +35,7 @@ namespace Chaldea.Services.Bangumis
             _animeRepository = animeRepository;
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("createOrUpdate")]
         [HttpPut]
         public async Task Create([FromBody] BangumiEditDto input)
@@ -67,6 +69,7 @@ namespace Chaldea.Services.Bangumis
             }
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{id}/delete")]
         [HttpDelete]
         public async Task Delete(string id)
@@ -134,6 +137,7 @@ namespace Chaldea.Services.Bangumis
             }
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{id}/import")]
         [HttpPost]
         public async Task Import(string id, [FromBody] ImportBangumiDto input)

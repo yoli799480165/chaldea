@@ -7,6 +7,7 @@ using Chaldea.Core.Nodes;
 using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
 using Chaldea.Services.Nodes.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -46,6 +47,7 @@ namespace Chaldea.Services.Nodes
             return _nodeManager.GetNodes();
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/getDirFiles")]
         [HttpPost]
         public async Task<ICollection<DirFileInfo>> GetDirFiles(string nodeId, [FromBody] GetDirFileDto input)
@@ -56,6 +58,7 @@ namespace Chaldea.Services.Nodes
             return await _nodeProxy.GetDirFiles(nodeId, input.Path);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/deleteDirFiles")]
         [HttpDelete]
         public async Task<string> DeleteDirFiles(string nodeId, [FromBody] ICollection<DirFileInfo> input)
@@ -69,6 +72,7 @@ namespace Chaldea.Services.Nodes
             return await _nodeProxy.DeleteDirFiles(nodeId, input);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/extractFiles")]
         [HttpPost]
         public async Task<string> ExtractFiles(string nodeId, [FromBody] ExtractFileDto input)
@@ -80,6 +84,7 @@ namespace Chaldea.Services.Nodes
             return await _nodeProxy.ExtractFiles(nodeId, extractFileInfo);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/getNetDiskDirFiles")]
         [HttpPost]
         public async Task<ICollection<DirFileInfo>> GetNetDiskDirFiles(string nodeId, [FromBody] GetDirFileDto input)
@@ -90,6 +95,7 @@ namespace Chaldea.Services.Nodes
             return await _nodeProxy.GetNetDiskDirFiles(nodeId, input.Path);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/bindSyncDir")]
         [HttpPost]
         public async Task BindSyncDir(string nodeId, [FromBody] SyncDirectory input)
@@ -130,6 +136,7 @@ namespace Chaldea.Services.Nodes
             }
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/getSyncDirs")]
         [HttpGet]
         public async Task<ICollection<SyncDirectory>> GetSyncDirs(string nodeId)
@@ -141,6 +148,7 @@ namespace Chaldea.Services.Nodes
             return nodeConfig != null ? nodeConfig.SyncDirectories : new List<SyncDirectory>();
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/syncDir")]
         [HttpPost]
         public async Task<string> SyncDir(string nodeId, [FromBody] SyncDirectory input)
@@ -154,6 +162,7 @@ namespace Chaldea.Services.Nodes
             return await _nodeProxy.SyncDir(nodeId, input);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{nodeId}/publishResource")]
         [HttpPost]
         public async Task PublishResource(string nodeId, [FromBody] PublishResourceDto input)

@@ -16,7 +16,7 @@ export const ROUTES: RouteInfo[] = [
     { path: 'icons', title: '消息管理', icon: 'pe-7s-chat', class: '' },
     { path: 'icons', title: '评论管理', icon: 'pe-7s-paper-plane', class: '' },
     { path: 'icons', title: '成就管理', icon: 'pe-7s-medal', class: '' },
-    { path: 'icons', title: '用户管理', icon: 'pe-7s-users', class: '' },
+    { path: 'user', title: '用户管理', icon: 'pe-7s-users', class: '' },
     { path: 'maps', title: '系统设置', icon: 'pe-7s-settings', class: '' }
 ];
 

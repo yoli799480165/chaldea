@@ -91,7 +91,7 @@ namespace Chaldea.IdentityServer.Configuration
                 {
                     Id = Guid.NewGuid().ToString("N"),
                     Name = "admin",
-                    PhoneNumber = "",
+                    PhoneNumber = "admin",
                     Address = "Address",
                     Email = "admin@chaldea.cn",
                     EmailVerified = true,

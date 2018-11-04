@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Chaldea.Core.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -17,6 +18,7 @@ namespace Chaldea.Services.Banners
             _bannerRepository = bannerRepository;
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("add")]
         [HttpPut]
         public async Task Add([FromBody] Banner banner)

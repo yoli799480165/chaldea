@@ -6,12 +6,14 @@ using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
 using Chaldea.Services.Dtos;
 using Chaldea.Services.Timetables.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
 namespace Chaldea.Services.Timetables
 {
+    [Authorize(Roles = nameof(UserRoles.Admin))]
     [Route("api/timetable")]
     public class TimetableService : ServiceBase
     {
@@ -25,7 +27,7 @@ namespace Chaldea.Services.Timetables
             _logger = logger;
             _timetableRepository = timetableRepository;
         }
-
+        
         [Route("createTimetable")]
         [HttpPut]
         public async Task CreateTimetable([FromBody] Timetable input)

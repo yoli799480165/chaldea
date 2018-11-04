@@ -4,10 +4,12 @@ using Chaldea.Core.Repositories;
 using Chaldea.IdentityServer.Configuration;
 using IdentityServer4.MongoDB.Interfaces;
 using IdentityServer4.MongoDB.Mappers;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Chaldea.IdentityServer
 {
@@ -35,6 +37,13 @@ namespace Chaldea.IdentityServer
                 .AddDeveloperSigningCredential()
                 .AddResourceOwnerValidator<ResourceOwnerPasswordValidator>()
                 .AddProfileService<ProfileService>();
+
+            var loggerFactory = new LoggerFactory();
+            var cors = new DefaultCorsPolicyService(loggerFactory.CreateLogger<DefaultCorsPolicyService>())
+            {
+                AllowAll = true
+            };
+            services.AddSingleton<ICorsPolicyService>(cors);
         }
 
         public void Configure(IApplicationBuilder app, IApplicationLifetime applicationLifetime)

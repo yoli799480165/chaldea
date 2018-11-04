@@ -6,6 +6,7 @@ using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
 using Chaldea.Services.Animes.Dto;
 using Chaldea.Services.Bangumis.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -92,6 +93,7 @@ namespace Chaldea.Services.Animes
             }
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("update")]
         [HttpPost]
         public async Task UpdateAnime([FromBody] AnimeDto input)
@@ -114,6 +116,7 @@ namespace Chaldea.Services.Animes
             }
         }
 
+        [Authorize(Roles = nameof(UserRoles.Admin))]
         [Route("{id}/removeVideos")]
         [HttpDelete]
         public async Task RemoveVideos(string id, [FromBody] ICollection<string> resources)
@@ -121,8 +124,8 @@ namespace Chaldea.Services.Animes
             var filter = Builders<Anime>.Filter.Eq(x => x.Id, id);
             var update = Builders<Anime>.Update.PullFilter(x => x.Videos, y => resources.Contains(y.Id));
             await _animeRepository.UpdateAsync(filter, update);
-//            var delete = Builders<Video>.Filter.In(x => x.Id, resources);
-//            await _videoRepository.DeleteManyAsync(delete);
+            var delete = Builders<Video>.Filter.In(x => x.Id, resources);
+            await _videoRepository.DeleteManyAsync(delete);
         }
     }
 }
