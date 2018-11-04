@@ -45,7 +45,8 @@ namespace Chaldea.Services.Animes
                         .Include(x => x.Cover);
                     ICollection<AnimeOutlineDto> list;
                     if (skip >= 0 && take > 0)
-                        list = await _animeRepository.GetAll().Skip(skip).Limit(take).Project<AnimeOutlineDto>(projection).ToListAsync();
+                        list = await _animeRepository.GetAll().Skip(skip).Limit(take)
+                            .Project<AnimeOutlineDto>(projection).ToListAsync();
                     else
                         list = await _animeRepository.GetAll().Project<AnimeOutlineDto>(projection).ToListAsync();
 
@@ -59,7 +60,7 @@ namespace Chaldea.Services.Animes
                     "{$project:{'animes._id':1,'animes.title':1,'animes.cover':1}}"
                 };
 
-                if (skip > 0 && take > 0)
+                if (skip >= 0 && take > 0)
                     stages.Add("{$project:{animes:{$slice:['$animes'," + skip + "," + take + "]}}}");
                 var pipeline = PipelineDefinition<Bangumi, BangumiAnimesDto>.Create(stages);
                 var bangumi = await _bangumiRepository.Aggregate(pipeline).FirstOrDefaultAsync();

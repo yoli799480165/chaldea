@@ -10,17 +10,29 @@ import { AnimeComponent } from './anime/anime.component';
 import { AnimeDetailComponent } from './anime/anime-detail/anime-detail.component';
 import { NodeResourceComponent } from './node/node-resource/node-resource.component';
 import { NodePublishComponent } from './node/node-publish/node-publish.component';
+import { LoginComponent } from './account/login/login.component';
+import { LayoutComponent } from './shared/layout/layout.component';
+import { TimetableComponent } from './timetable/timetable.component';
 
 const routes: Routes = [
-  { path: 'dashboard', component: HomeComponent },
-  { path: 'bangumi', component: BangumiComponent },
-  { path: 'anime', component: AnimeComponent },
-  { path: 'anime-detail/:animeId', component: AnimeDetailComponent },
-  { path: 'node-resource', component: NodeResourceComponent },
-  { path: 'node-publish/:key', component: NodePublishComponent },
-  { path: 'notifications', component: NotificationsComponent },
-  { path: 'upgrade', component: UpgradeComponent },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: 'app',
+    component: LayoutComponent,
+    children: [
+      { path: 'dashboard', component: HomeComponent },
+      { path: 'bangumi', component: BangumiComponent },
+      { path: 'anime', component: AnimeComponent },
+      { path: 'anime/:bangumi', component: AnimeComponent },
+      { path: 'anime-detail/:animeId', component: AnimeDetailComponent },
+      { path: 'node-resource', component: NodeResourceComponent },
+      { path: 'node-publish/:key', component: NodePublishComponent },
+      { path: 'timetable', component: TimetableComponent },
+      { path: 'notifications', component: NotificationsComponent },
+      { path: 'upgrade', component: UpgradeComponent }
+    ]
+  },
+  { path: 'login', component: LoginComponent }
 ];
 
 @NgModule({

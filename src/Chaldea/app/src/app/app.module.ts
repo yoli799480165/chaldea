@@ -43,6 +43,13 @@ import { TypographyComponent } from './typography/typography.component';
 import { UpgradeComponent } from './upgrade/upgrade.component';
 import { UserComponent } from './user/user.component';
 import { ExtractFileComponent } from './node/node-resource/extract-file/extract-file.component';
+import { LoginComponent } from './account/login/login.component';
+import { LayoutComponent } from './shared/layout/layout.component';
+import { TimetableComponent } from './timetable/timetable.component';
+import { TimetableEditComponent } from './timetable/timetable-edit/timetable-edit.component';
+import { BsDatepickerModule } from 'ngx-bootstrap';
+import { TimepickerModule } from 'ngx-bootstrap';
+import { ClipboardModule } from 'ngx-clipboard';
 
 export function getRemoteServiceBaseUrl(): string {
   return AppConsts.appBaseUrl;
@@ -51,6 +58,7 @@ export function getRemoteServiceBaseUrl(): string {
 @NgModule({
   declarations: [
     AppComponent,
+    LayoutComponent,
     HomeComponent,
     UserComponent,
     TablesComponent,
@@ -69,13 +77,18 @@ export function getRemoteServiceBaseUrl(): string {
     NodeResourceComponent,
     NodeBindingComponent,
     NodePublishComponent,
-    ExtractFileComponent
+    ExtractFileComponent,
+    LoginComponent,
+    TimetableComponent,
+    TimetableEditComponent
   ],
   imports: [
     NgxCoolDialogsModule.forRoot(),
     ModalModule.forRoot(),
     SortablejsModule.forRoot({ animation: 150 }),
     NgxLoadingModule.forRoot({}),
+    BsDatepickerModule.forRoot(),
+    TimepickerModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
@@ -89,7 +102,8 @@ export function getRemoteServiceBaseUrl(): string {
     HttpClientModule,
     ServiceProxyModule,
     TreeModule,
-    SelectDropDownModule
+    SelectDropDownModule,
+    ClipboardModule
   ],
   providers: [
     ModalService,
@@ -103,7 +117,8 @@ export function getRemoteServiceBaseUrl(): string {
     AnimeImportComponent,
     NodeBindingComponent,
     NodePublishComponent,
-    ExtractFileComponent
+    ExtractFileComponent,
+    TimetableEditComponent
   ]
 })
 export class AppModule { }

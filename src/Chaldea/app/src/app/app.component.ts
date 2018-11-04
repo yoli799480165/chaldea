@@ -4,21 +4,6 @@ import { LoadingService } from './shared/loading-service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: './app.component.html'
 })
-export class AppComponent implements OnInit {
-  loading = false;
-
-  constructor(
-    public location: Location,
-    private loadingService: LoadingService
-  ) {
-    this.loadingService.subject.subscribe((rep: boolean) => {
-      this.loading = rep;
-    });
-  }
-
-  ngOnInit() {
-  }
-}
+export class AppComponent { }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Chaldea.Core.Nodes;
 
 namespace Chaldea.Core.Repositories
@@ -350,5 +351,27 @@ namespace Chaldea.Core.Repositories
         Servant = 1,
         Master = 2,
         Admin = 999
+    }
+
+    /// <summary>
+    ///     时间表
+    /// </summary>
+    public class Timetable : IEntity<string>
+    {
+        public string AnimeId { get; set; }
+
+        public string SourceUrl { get; set; }
+
+        public string SourcePwd { get; set; }
+
+        public DateTime BeginDate { get; set; }
+
+        public DateTime EndDate { get; set; }
+
+        public TimeSpan UpdateTime { get; set; }
+
+        public DayOfWeek UpdateWeek { get; set; }
+
+        public string Id { get; set; }
     }
 }

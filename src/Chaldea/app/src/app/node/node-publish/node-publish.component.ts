@@ -17,7 +17,7 @@ export class NodePublishComponent extends ComponentBase implements OnInit {
   animes: AnimeOutlineDto[] = [];
   selectAnimes: AnimeOutlineDto[];
   selectDirFiles: PublishDirFileInfo[] = [];
-  displayFormat = '第{0}话';
+  displayFormat = '第{1}话';
   nodeId: string;
   urlPrefix = '';
 
@@ -100,6 +100,6 @@ export class NodePublishComponent extends ComponentBase implements OnInit {
 
   getDisplayName(displayFormat: string, index: number): string {
     const num = +displayFormat.match(/\d+/g);
-    return displayFormat.replace(/{\d+}/g, (index + num + 1).toString().padStart(2, '0'));
+    return displayFormat.replace(/{\d+}/g, (index + num).toString().padStart(2, '0'));
   }
 }

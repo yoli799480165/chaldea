@@ -3,7 +3,7 @@ import { AnimeServiceProxy, AnimeOutlineDto, BangumiServiceProxy, BangumiDto } f
 import { AppConsts } from 'shared/AppConsts';
 import { ComponentBase } from '../shared/component-base';
 import { AnimeImportComponent } from './anime-import/anime-import.component';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-anime',
@@ -19,6 +19,7 @@ export class AnimeComponent extends ComponentBase implements OnInit {
   constructor(
     private injector: Injector,
     private router: Router,
+    private activeRoute: ActivatedRoute,
     private bangumiServiceProxy: BangumiServiceProxy,
     private animeServiceProxy: AnimeServiceProxy
   ) {
@@ -31,13 +32,18 @@ export class AnimeComponent extends ComponentBase implements OnInit {
   }
 
   getBangumiList(): void {
+    const defaultBangumi = this.activeRoute.snapshot.params['bangumi'];
     this.bangumiServiceProxy.getList().subscribe((rep) => {
       const bangumi = new BangumiDto();
       bangumi.id = '';
       bangumi.name = '显示全部';
       rep.unshift(bangumi);
       this.bangumis = rep;
-      this.selectBangumi = rep.length > 1 ? rep[1] : rep[0];
+      if (defaultBangumi) {
+        this.selectBangumi = rep.find(x => x.name === defaultBangumi);
+      } else {
+        this.selectBangumi = rep.length > 1 ? rep[1] : rep[0];
+      }
       this.getList();
     });
   }
@@ -59,6 +65,6 @@ export class AnimeComponent extends ComponentBase implements OnInit {
   }
 
   showDetail(anime: AnimeOutlineDto): void {
-    this.router.navigate(['/anime-detail', anime.id]);
+    this.router.navigate(['/app/anime-detail', anime.id]);
   }
 }

@@ -29,8 +29,10 @@ export class ExtractFileComponent extends ComponentBase implements OnInit {
     }
 
     extract(): void {
+        this.loading.show();
         this.nodeServiceProxy.extractFiles(this.nodeId, this.extractFileDto).subscribe((msg) => {
             this.modal.dismiss(msg);
+            this.loading.hide();
         });
     }
 }

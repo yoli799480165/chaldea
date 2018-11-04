@@ -7,7 +7,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#" >{{getTitle()}}</a>
+            <a class="navbar-brand" href="#">{{getTitle()}}</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-left">
@@ -67,7 +67,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#">
+                    <a (click)="logout()">
                         <p>Log out</p>
                     </a>
                 </li>
