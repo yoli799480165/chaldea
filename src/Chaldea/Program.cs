@@ -25,9 +25,6 @@ namespace Chaldea
                     logging.AddFile(loggingConfig.GetSection("Serilog"));
                 })
                 .UseStartup<Startup>()
-#if DEBUG
-                .UseUrls("http://*:9001")
-#endif
                 .Build();
         }
     }

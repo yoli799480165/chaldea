@@ -18,6 +18,8 @@
 
         public int FrameRate { get; set; }
 
+        public int CurrentTime { get; set; }
+
         public string Id { get; set; }
     }
 }

@@ -19,13 +19,15 @@ export class LoginService {
         body.append('username', userName);
         body.append('password', password);
         body.append('grant_type', 'password');
-        body.append('client_id', 'chaldea-mobile');
-        body.append('client_secret', '613b807c57a641e881be80c6333de409');
+        body.append('client_id', AppConsts.clientId);
+        body.append('client_secret', AppConsts.clientSecret);
         this.httpClient.post(`${AppConsts.idServerUrl}/connect/token`, body)
             .subscribe((rep) => {
+                console.log(rep);
                 this.tokenService.setToken(<TokenDto>rep);
                 this.router.navigate(['/app/dashboard']);
-            }, () => {
+            }, (error) => {
+                console.log(error);
             });
     }
 }

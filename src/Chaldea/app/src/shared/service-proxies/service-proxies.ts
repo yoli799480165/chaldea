@@ -2111,6 +2111,7 @@ export class AnimeTagDto implements IAnimeTagDto {
     types: string[] | undefined;
     tags: string[] | undefined;
     states: string[] | undefined;
+    levels: number[] | undefined;
 
     constructor(data?: IAnimeTagDto) {
         if (data) {
@@ -2138,6 +2139,11 @@ export class AnimeTagDto implements IAnimeTagDto {
                 for (let item of data["states"])
                     this.states.push(item);
             }
+            if (data["levels"] && data["levels"].constructor === Array) {
+                this.levels = [];
+                for (let item of data["levels"])
+                    this.levels.push(item);
+            }
         }
     }
 
@@ -2164,6 +2170,11 @@ export class AnimeTagDto implements IAnimeTagDto {
             for (let item of this.states)
                 data["states"].push(item);
         }
+        if (this.levels && this.levels.constructor === Array) {
+            data["levels"] = [];
+            for (let item of this.levels)
+                data["levels"].push(item);
+        }
         return data; 
     }
 }
@@ -2172,6 +2183,7 @@ export interface IAnimeTagDto {
     types: string[] | undefined;
     tags: string[] | undefined;
     states: string[] | undefined;
+    levels: number[] | undefined;
 }
 
 export class BangumiEditDto implements IBangumiEditDto {

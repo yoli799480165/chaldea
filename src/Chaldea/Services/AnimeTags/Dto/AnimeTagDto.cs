@@ -9,5 +9,7 @@ namespace Chaldea.Services.AnimeTags.Dto
         public List<string> Tags { get; set; }
 
         public List<string> States { get; set; }
+
+        public List<int> Levels { get; set; }
     }
 }

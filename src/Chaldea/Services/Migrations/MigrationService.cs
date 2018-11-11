@@ -86,7 +86,8 @@ namespace Chaldea.Services.Migrations
                         "真人版",
                         "OVA",
                         "OAD"
-                    }
+                    },
+                    Levels = new List<int> {0, 12, 15, 18}
                 };
                 await _animeTagRepository.AddAsync(animeTag);
             }

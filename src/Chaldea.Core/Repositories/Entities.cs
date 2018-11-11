@@ -118,6 +118,8 @@ namespace Chaldea.Core.Repositories
 
         public List<string> States { get; set; }
 
+        public List<int> Levels { get; set; }
+
         public string Id { get; set; }
     }
 
@@ -304,15 +306,6 @@ namespace Chaldea.Core.Repositories
     }
 
     /// <summary>
-    ///     节点状态
-    /// </summary>
-    public enum NodeState
-    {
-        Offline = 0,
-        Online = 1
-    }
-
-    /// <summary>
     ///     用户
     /// </summary>
     public class User : IEntity<string>
@@ -345,17 +338,6 @@ namespace Chaldea.Core.Repositories
     }
 
     /// <summary>
-    ///     用户角色
-    /// </summary>
-    public enum UserRoles
-    {
-        Human = 0,
-        Servant = 1,
-        Master = 2,
-        Admin = 999
-    }
-
-    /// <summary>
     ///     时间表
     /// </summary>
     public class Timetable : IEntity<string>
@@ -375,5 +357,57 @@ namespace Chaldea.Core.Repositories
         public DayOfWeek UpdateWeek { get; set; }
 
         public string Id { get; set; }
+    }
+
+    /// <summary>
+    ///     浏览历史
+    /// </summary>
+    public class History : IEntity<string>
+    {
+        public DateTime CreationTime { get; set; }
+
+        public DateTime LastModificationTime { get; set; }
+
+        public int CurrentTime { get; set; }
+
+        public string UserId { get; set; }
+
+        public string AnimeId { get; set; }
+
+        public string ResourceId { get; set; }
+
+        public string Id { get; set; }
+    }
+
+    /// <summary>
+    ///     节点状态
+    /// </summary>
+    public enum NodeState
+    {
+        Offline = 0,
+        Online = 1
+    }
+
+    /// <summary>
+    ///     用户角色
+    /// </summary>
+    public enum UserRoles
+    {
+        Human = 0,
+        Servant = 1,
+        Master = 2,
+        Admin = 999
+    }
+
+    /// <summary>
+    ///     动漫分级
+    /// </summary>
+    public enum AnimeLevel
+    {
+        R0 = 0,
+        R12 = 12,
+        R15 = 15,
+        R18 = 18,
+        R999 = 999
     }
 }

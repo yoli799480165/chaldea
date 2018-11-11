@@ -88,6 +88,7 @@ namespace Chaldea.Services.Bangumis
             }
         }
 
+        [AllowAnonymous]
         [Route("getList")]
         [HttpGet]
         public async Task<ICollection<BangumiDto>> GetList()
@@ -105,6 +106,7 @@ namespace Chaldea.Services.Bangumis
             }
         }
 
+        [AllowAnonymous]
         [Route("getAnimes")]
         [HttpGet]
         public async Task<ICollection<BangumiAnimesDto>> GetAnimes(int skip, int take, int slice)
@@ -114,7 +116,12 @@ namespace Chaldea.Services.Bangumis
                 var stages = new List<string>
                 {
                     "{$lookup:{localField:'animes',from:'animes',foreignField:'_id',as:'animes'}}",
-                    "{$project:{'_id':1,'name':1,'animes._id':1,'animes.title':1,'animes.cover':1}}"
+                    "{$unwind:'$animes'}",
+                    "{$match:{'animes.level':{$lte:" + MaxLevel + "}}}",
+                    "{$sort:{'animes.playCounts':-1}}",
+                    "{$group:{'_id':{'_id':'$_id','name':'$name'},'animes':{$push:'$animes'}}}",
+                    "{$project:{'_id':'$_id._id','name':'$_id.name','animes._id':1,'animes.title':1,'animes.cover':1}}",
+                    "{$sort:{'name':-1}}"
                 };
 
                 if (slice > 0) stages.Add("{$project:{'_id':1,'name':1,animes:{$slice:['$animes'," + slice + "]}}}");

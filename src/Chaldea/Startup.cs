@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Chaldea.Core;
 using Chaldea.Infrastructure.Sms.Aliyun;
 using Chaldea.Services;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Chaldea
@@ -46,10 +49,19 @@ namespace Chaldea
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication(options =>
                 {
+                    options.EnableCaching = true;
+                    options.CacheDuration = TimeSpan.FromMinutes(15);
                     options.Authority = Configuration.GetSection("Authentication:IdentityServerUrl").Value;
                     options.RequireHttpsMetadata = false;
-
                     options.ApiName = "api1";
+                    options.JwtBearerEvents.OnAuthenticationFailed += context =>
+                    {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.StatusCode = 401;
+                        }
+                        return Task.CompletedTask;
+                    };
                 });
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
             services.AddDataProvider(Configuration.GetSection("MongoDB"));

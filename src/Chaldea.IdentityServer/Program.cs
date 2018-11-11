@@ -22,9 +22,6 @@ namespace Chaldea.IdentityServer
                     var loggingConfig = hostingContext.Configuration.GetSection("Logging");
                     logging.AddFile(loggingConfig.GetSection("Serilog"));
                 })
-#if DEBUG
-                .UseUrls("http://*:9000")
-#endif
                 .UseStartup<Startup>();
         }
     }

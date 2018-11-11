@@ -37,7 +37,7 @@ import { NodeResourceComponent } from './node/node-resource/node-resource.compon
 import { NodeComponent } from './node/node.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { FooterModule } from './shared/footer/footer.module';
-import { ChaldeaHttpInterceptor } from './shared/http-interceptor';
+import { RefreshTokenHttpInterceptor } from './shared/http-interceptor';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { LoadingService } from './shared/loading-service';
 import { NavbarModule } from './shared/navbar/navbar.module';
@@ -109,7 +109,7 @@ export function getRemoteServiceBaseUrl(): string {
     ClipboardModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: ChaldeaHttpInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: RefreshTokenHttpInterceptor, multi: true },
     { provide: API_BASE_URL, useFactory: getRemoteServiceBaseUrl },
     TokenService,
     LoginService,

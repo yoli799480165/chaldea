@@ -40,6 +40,9 @@
                 <div class="tag">
                   <a *ngFor="let state of animeTag.states" (click)="anime.state = state" [ngClass]="{'selected': state==anime.state}">{{state}}</a>
                 </div>
+                <div class="tag">
+                  <a *ngFor="let level of animeTag.levels" (click)="anime.level = level" [ngClass]="{'selected': level==anime.level}">R{{level}}</a>
+                </div>
               </div>
 
               <div class="section">

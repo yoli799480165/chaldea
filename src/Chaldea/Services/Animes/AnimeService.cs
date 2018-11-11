@@ -34,6 +34,7 @@ namespace Chaldea.Services.Animes
             _videoRepository = videoRepository;
         }
 
+        [AllowAnonymous]
         [Route("getList")]
         [HttpGet]
         public async Task<ICollection<AnimeOutlineDto>> GetList(string bangumiId, int skip, int take)
@@ -44,12 +45,14 @@ namespace Chaldea.Services.Animes
                 {
                     var projection = Builders<Anime>.Projection.Include(x => x.Id).Include(x => x.Title)
                         .Include(x => x.Cover);
+                    var sort = Builders<Anime>.Sort.Descending(x => x.PlayCounts);
                     ICollection<AnimeOutlineDto> list;
                     if (skip >= 0 && take > 0)
-                        list = await _animeRepository.GetAll().Skip(skip).Limit(take)
+                        list = await _animeRepository.GetAll(x => x.Level <= MaxLevel).Skip(skip).Limit(take).Sort(sort)
                             .Project<AnimeOutlineDto>(projection).ToListAsync();
                     else
-                        list = await _animeRepository.GetAll().Project<AnimeOutlineDto>(projection).ToListAsync();
+                        list = await _animeRepository.GetAll(x => x.Level <= MaxLevel).Sort(sort)
+                            .Project<AnimeOutlineDto>(projection).ToListAsync();
 
                     return list;
                 }
@@ -58,6 +61,10 @@ namespace Chaldea.Services.Animes
                 {
                     "{$match:{_id:'" + bangumiId + "'}}",
                     "{$lookup:{localField:'animes',from:'animes',foreignField:'_id',as:'animes'}}",
+                    "{$unwind:'$animes'}",
+                    "{$match:{'animes.level':{$lte:" + MaxLevel + "}}}",
+                    "{$sort:{'animes.playCounts':-1}}",
+                    "{$group:{'_id':'$_id','animes':{$push:'$animes'}}}",
                     "{$project:{'animes._id':1,'animes.title':1,'animes.cover':1}}"
                 };
 
@@ -74,6 +81,7 @@ namespace Chaldea.Services.Animes
             }
         }
 
+        [AllowAnonymous]
         [Route("getAnime")]
         [HttpGet]
         public async Task<AnimeDto> GetAnime(string animeId)
