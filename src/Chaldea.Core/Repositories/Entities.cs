@@ -368,6 +368,8 @@ namespace Chaldea.Core.Repositories
 
         public DateTime LastModificationTime { get; set; }
 
+        public string Screenshot { get; set; }
+
         public int CurrentTime { get; set; }
 
         public string UserId { get; set; }

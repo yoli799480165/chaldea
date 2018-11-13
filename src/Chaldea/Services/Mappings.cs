@@ -23,6 +23,7 @@ namespace Chaldea.Services
                 cfg.CreateMap<AnimeTagDto, AnimeTag>();
                 cfg.CreateMap<Video, VideoDto>().ForMember(x => x.CurrentTime, opt => opt.Ignore());
                 cfg.CreateMap<UserDto, User>();
+                cfg.CreateMap<HistoryDto, History>();
                 cfg.CreateMap<ICollection<UserDto>, ICollection<User>>();
                 cfg.CreateMap<ICollection<BangumiDto>, ICollection<Bangumi>>();
                 cfg.CreateMap<ICollection<AnimeOutlineDto>, ICollection<Anime>>();

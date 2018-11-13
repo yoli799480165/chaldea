@@ -69,7 +69,7 @@ export class TimetableEditComponent extends ComponentBase implements OnInit {
     this.input.updateWeek = +this.selectWeek.value;
     this.timetableServiceProxy.createTimetable(this.input).subscribe(() => {
       this.loading.hide();
-      this.modal.dismiss(true);
+      // this.modal.dismiss(true);
     });
   }
 }

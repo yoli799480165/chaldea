@@ -6,6 +6,8 @@
 
         public string ResourceId { get; set; }
 
+        public string Screenshot { get; set; }
+
         public string AnimeId { get; set; }
 
         public string Id { get; set; }
