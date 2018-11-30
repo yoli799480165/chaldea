@@ -21,6 +21,11 @@
     <input type="text" class="form-control" [(ngModel)]="urlPrefix" (ngModelChange)="setUrl($event)">
   </div>
 
+  <div class="form-group">
+    <label>重新发布:</label>
+    <input type="checkbox" [(ngModel)]="clean">
+  </div>
+
   <table class="table table-hover table-striped">
     <thead>
       <tr>

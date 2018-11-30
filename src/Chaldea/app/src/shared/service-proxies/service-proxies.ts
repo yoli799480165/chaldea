@@ -816,6 +816,182 @@ export class BannerServiceProxy {
 }
 
 @Injectable()
+export class HistoryServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @input (optional) 
+     * @return Success
+     */
+    addOrUpdateHistory(input: HistoryDto | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/history/addOrUpdateHistory";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processAddOrUpdateHistory(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processAddOrUpdateHistory(response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processAddOrUpdateHistory(response: HttpResponse<Blob>): Observable<void> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+
+    /**
+     * @skip (optional) 
+     * @take (optional) 
+     * @return Success
+     */
+    getHistories(skip: number | null, take: number | null): Observable<HistoryDetailDto[]> {
+        let url_ = this.baseUrl + "/api/history/getHistories?";
+        if (skip !== undefined)
+            url_ += "skip=" + encodeURIComponent("" + skip) + "&"; 
+        if (take !== undefined)
+            url_ += "take=" + encodeURIComponent("" + take) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetHistories(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetHistories(response_);
+                } catch (e) {
+                    return <Observable<HistoryDetailDto[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<HistoryDetailDto[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetHistories(response: HttpResponse<Blob>): Observable<HistoryDetailDto[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(HistoryDetailDto.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<HistoryDetailDto[]>(<any>null);
+    }
+
+    /**
+     * @animeId (optional) 
+     * @return Success
+     */
+    getAnimeHistories(animeId: string | null): Observable<HistoryDto[]> {
+        let url_ = this.baseUrl + "/api/history/getAnimeHistories?";
+        if (animeId !== undefined)
+            url_ += "animeId=" + encodeURIComponent("" + animeId) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processGetAnimeHistories(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponse) {
+                try {
+                    return this.processGetAnimeHistories(response_);
+                } catch (e) {
+                    return <Observable<HistoryDto[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<HistoryDto[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processGetAnimeHistories(response: HttpResponse<Blob>): Observable<HistoryDto[]> {
+        const status = response.status; 
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(response.body).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(HistoryDto.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(response.body).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<HistoryDto[]>(<any>null);
+    }
+}
+
+@Injectable()
 export class MigrateServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -1791,13 +1967,16 @@ export class VideoServiceProxy {
     }
 
     /**
+     * @animeId (optional) 
      * @return Success
      */
-    getVideo(id: string): Observable<VideoDto> {
-        let url_ = this.baseUrl + "/api/video/{id}/getVideo";
+    getVideoForPlayer(animeId: string | null, id: string): Observable<VideoDto> {
+        let url_ = this.baseUrl + "/api/video/{id}/getVideoForPlayer?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+        if (animeId !== undefined)
+            url_ += "animeId=" + encodeURIComponent("" + animeId) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1810,11 +1989,11 @@ export class VideoServiceProxy {
         };
 
         return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processGetVideo(response_);
+            return this.processGetVideoForPlayer(response_);
         }).catch((response_: any) => {
             if (response_ instanceof HttpResponse) {
                 try {
-                    return this.processGetVideo(response_);
+                    return this.processGetVideoForPlayer(response_);
                 } catch (e) {
                     return <Observable<VideoDto>><any>Observable.throw(e);
                 }
@@ -1823,7 +2002,7 @@ export class VideoServiceProxy {
         });
     }
 
-    protected processGetVideo(response: HttpResponse<Blob>): Observable<VideoDto> {
+    protected processGetVideoForPlayer(response: HttpResponse<Blob>): Observable<VideoDto> {
         const status = response.status; 
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
@@ -2405,6 +2584,120 @@ export interface IBanner {
     id: string | undefined;
 }
 
+export class HistoryDto implements IHistoryDto {
+    currentTime: number | undefined;
+    resourceId: string | undefined;
+    screenshot: string | undefined;
+    animeId: string | undefined;
+    id: string | undefined;
+
+    constructor(data?: IHistoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.currentTime = data["currentTime"];
+            this.resourceId = data["resourceId"];
+            this.screenshot = data["screenshot"];
+            this.animeId = data["animeId"];
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): HistoryDto {
+        let result = new HistoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["currentTime"] = this.currentTime;
+        data["resourceId"] = this.resourceId;
+        data["screenshot"] = this.screenshot;
+        data["animeId"] = this.animeId;
+        data["id"] = this.id;
+        return data; 
+    }
+}
+
+export interface IHistoryDto {
+    currentTime: number | undefined;
+    resourceId: string | undefined;
+    screenshot: string | undefined;
+    animeId: string | undefined;
+    id: string | undefined;
+}
+
+export class HistoryDetailDto implements IHistoryDetailDto {
+    duration: number | undefined;
+    currentTime: number | undefined;
+    animeId: string | undefined;
+    animeTitle: string | undefined;
+    sourceTitle: string | undefined;
+    screenshot: string | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    id: string | undefined;
+
+    constructor(data?: IHistoryDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.duration = data["duration"];
+            this.currentTime = data["currentTime"];
+            this.animeId = data["animeId"];
+            this.animeTitle = data["animeTitle"];
+            this.sourceTitle = data["sourceTitle"];
+            this.screenshot = data["screenshot"];
+            this.lastModificationTime = data["lastModificationTime"] ? moment(data["lastModificationTime"].toString()) : <any>undefined;
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): HistoryDetailDto {
+        let result = new HistoryDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["duration"] = this.duration;
+        data["currentTime"] = this.currentTime;
+        data["animeId"] = this.animeId;
+        data["animeTitle"] = this.animeTitle;
+        data["sourceTitle"] = this.sourceTitle;
+        data["screenshot"] = this.screenshot;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        return data; 
+    }
+}
+
+export interface IHistoryDetailDto {
+    duration: number | undefined;
+    currentTime: number | undefined;
+    animeId: string | undefined;
+    animeTitle: string | undefined;
+    sourceTitle: string | undefined;
+    screenshot: string | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    id: string | undefined;
+}
+
 export class Node implements INode {
     name: string | undefined;
     osType: string | undefined;
@@ -2642,6 +2935,7 @@ export interface ISyncDirectory {
 
 export class PublishResourceDto implements IPublishResourceDto {
     animeId: string | undefined;
+    clean: boolean | undefined;
     publishFiles: PublishDirFileInfo[] | undefined;
 
     constructor(data?: IPublishResourceDto) {
@@ -2656,6 +2950,7 @@ export class PublishResourceDto implements IPublishResourceDto {
     init(data?: any) {
         if (data) {
             this.animeId = data["animeId"];
+            this.clean = data["clean"];
             if (data["publishFiles"] && data["publishFiles"].constructor === Array) {
                 this.publishFiles = [];
                 for (let item of data["publishFiles"])
@@ -2673,6 +2968,7 @@ export class PublishResourceDto implements IPublishResourceDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["animeId"] = this.animeId;
+        data["clean"] = this.clean;
         if (this.publishFiles && this.publishFiles.constructor === Array) {
             data["publishFiles"] = [];
             for (let item of this.publishFiles)
@@ -2684,6 +2980,7 @@ export class PublishResourceDto implements IPublishResourceDto {
 
 export interface IPublishResourceDto {
     animeId: string | undefined;
+    clean: boolean | undefined;
     publishFiles: PublishDirFileInfo[] | undefined;
 }
 
@@ -2975,6 +3272,7 @@ export class VideoDto implements IVideoDto {
     frameWidth: number | undefined;
     frameHeight: number | undefined;
     frameRate: number | undefined;
+    currentTime: number | undefined;
     id: string | undefined;
 
     constructor(data?: IVideoDto) {
@@ -2996,6 +3294,7 @@ export class VideoDto implements IVideoDto {
             this.frameWidth = data["frameWidth"];
             this.frameHeight = data["frameHeight"];
             this.frameRate = data["frameRate"];
+            this.currentTime = data["currentTime"];
             this.id = data["id"];
         }
     }
@@ -3016,6 +3315,7 @@ export class VideoDto implements IVideoDto {
         data["frameWidth"] = this.frameWidth;
         data["frameHeight"] = this.frameHeight;
         data["frameRate"] = this.frameRate;
+        data["currentTime"] = this.currentTime;
         data["id"] = this.id;
         return data; 
     }
@@ -3030,6 +3330,7 @@ export interface IVideoDto {
     frameWidth: number | undefined;
     frameHeight: number | undefined;
     frameRate: number | undefined;
+    currentTime: number | undefined;
     id: string | undefined;
 }
 

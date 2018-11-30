@@ -18,7 +18,7 @@ namespace Chaldea.Services
             {
                 cfg.CreateMap<BangumiEditDto, Bangumi>();
                 cfg.CreateMap<BangumiAnimesDto, Bangumi>();
-                cfg.CreateMap<AnimeDto, Anime>();
+                cfg.CreateMap<Anime, AnimeDto>().ForMember(x => x.IsSubscribed, opt => opt.Ignore());
                 cfg.CreateMap<AnimeOutlineDto, Anime>();
                 cfg.CreateMap<AnimeTagDto, AnimeTag>();
                 cfg.CreateMap<Video, VideoDto>().ForMember(x => x.CurrentTime, opt => opt.Ignore());

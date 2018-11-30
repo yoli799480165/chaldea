@@ -66,11 +66,12 @@ namespace Chaldea.Services.Histories
                 }
                 else
                 {
-                    var screenshotFile = $"{history.Id}.jpg";
+                    var screenshotFile = $"{Guid.NewGuid():N}.jpg";
                     System.IO.File.WriteAllBytes(Path.Combine(HistoryPath, screenshotFile),
                         GetDataFromBase64Image(input.Screenshot));
                     history.LastModificationTime = DateTime.UtcNow;
                     history.CurrentTime = input.CurrentTime;
+                    history.Screenshot = screenshotFile;
                     await _historyRepository.UpdateAsync(history);
                 }
             }
@@ -92,9 +93,7 @@ namespace Chaldea.Services.Histories
                     "{$match:{userId:'" + UserId + "'}}",
                     "{$lookup:{localField:'animeId',from:'animes',foreignField:'_id',as:'anime'}}",
                     "{$unwind:'$anime'}",
-                    "{$lookup:{localField:'resourceId',from:'videos',foreignField:'_id',as:'resource'}}",
-                    "{$unwind:'$resource'}",
-                    "{$project:{'_id':1,'lastModificationTime':1,'currentTime':1,'screenshot':1,'animeId':1,'animeTitle':'$anime.title','sourceTitle':'$resource.title','duration':'$resource.duration'}}",
+                    "{$project:{'_id':1,'lastModificationTime':1,'currentTime':1,'screenshot':1,'animeId':1,'animeTitle':'$anime.title','sourceTitle':1,'duration':1}}",
                     "{$sort:{'lastModificationTime':-1}}"
                 };
 

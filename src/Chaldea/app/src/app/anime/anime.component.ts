@@ -24,7 +24,7 @@ export class AnimeComponent extends ComponentBase implements OnInit {
     private animeServiceProxy: AnimeServiceProxy
   ) {
     super(injector);
-    this.coverUrl = `${AppConsts.appBaseUrl}/statics/imgs/`
+    this.coverUrl = `${AppConsts.appBaseUrl}/statics/imgs/cover/`
   }
 
   ngOnInit() {

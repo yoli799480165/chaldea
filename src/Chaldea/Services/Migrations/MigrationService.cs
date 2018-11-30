@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Chaldea.Core.Repositories;
 using Chaldea.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 
 namespace Chaldea.Services.Migrations
 {
@@ -14,14 +16,20 @@ namespace Chaldea.Services.Migrations
     public class MigrationService : ServiceBase
     {
         private readonly IRepository<string, AnimeTag> _animeTagRepository;
+        private readonly IRepository<string, History> _historyRepository;
+        private readonly IRepository<string, Video> _videoRepository;
         private readonly ILogger<MigrationService> _logger;
 
         public MigrationService(
             ILogger<MigrationService> logger,
-            IRepository<string, AnimeTag> animeTagRepository)
+            IRepository<string, AnimeTag> animeTagRepository,
+            IRepository<string, History> historyRepository,
+            IRepository<string, Video> videoRepository)
         {
             _logger = logger;
             _animeTagRepository = animeTagRepository;
+            _historyRepository = historyRepository;
+            _videoRepository = videoRepository;
         }
 
         [Route("migrateAnimeTags")]
@@ -96,6 +104,27 @@ namespace Chaldea.Services.Migrations
                 _logger.LogError(ex.ToString());
                 throw new UserFriendlyException("Migrate anime tag failed.");
             }
+        }
+
+        [Route("migrateHistories")]
+        [HttpGet]
+        public async Task MigrateHistories()
+        {
+            var histories = (await _historyRepository.GetAllListAsync()).OrderBy(x => x.ResourceId).ToList();
+            var ids = histories.Select(x => x.ResourceId).ToList();
+            var filter = Builders<Video>.Filter.In(x => x.Id, ids);
+            var videos = (await _videoRepository.GetAll(filter).ToListAsync()).OrderBy(x => x.Id).ToList();
+
+            var newHistories = histories.Zip(videos, (history, video) =>
+            {
+                history.Duration = video.Duration;
+                history.SourceTitle = video.Title;
+                return history;
+            }).ToList();
+
+            var hids = histories.Select(x => x.Id).ToList();
+            await _historyRepository.DeleteManyAsync(Builders<History>.Filter.In(x => x.Id, hids));
+            await _historyRepository.AddManyAsync(newHistories);
         }
     }
 }

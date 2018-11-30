@@ -4,6 +4,10 @@
     {
         public int CurrentTime { get; set; }
 
+        public int Duration { get; set; }
+
+        public string SourceTitle { get; set; }
+
         public string ResourceId { get; set; }
 
         public string Screenshot { get; set; }

@@ -372,11 +372,29 @@ namespace Chaldea.Core.Repositories
 
         public int CurrentTime { get; set; }
 
+        public int Duration { get; set; }
+
+        public string SourceTitle { get; set; }
+
         public string UserId { get; set; }
 
         public string AnimeId { get; set; }
 
         public string ResourceId { get; set; }
+
+        public string Id { get; set; }
+    }
+
+    /// <summary>
+    ///     收藏
+    /// </summary>
+    public class Favorite : IEntity<string>
+    {
+        public DateTime CreationTime { get; set; }
+
+        public string AnimeId { get; set; }
+
+        public string UserId { get; set; }
 
         public string Id { get; set; }
     }

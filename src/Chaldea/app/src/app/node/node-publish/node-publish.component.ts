@@ -20,6 +20,7 @@ export class NodePublishComponent extends ComponentBase implements OnInit {
   displayFormat = '第{1}话';
   nodeId: string;
   urlPrefix = '';
+  clean = false;
 
   config = {
     displayKey: 'title',
@@ -90,6 +91,7 @@ export class NodePublishComponent extends ComponentBase implements OnInit {
     const input = new PublishResourceDto();
     input.animeId = this.selectAnimes[0].id;
     input.publishFiles = this.selectDirFiles;
+    input.clean = this.clean;
     this.nodeServiceProxy.publishResource(this.nodeId, input).subscribe(() => {
       this.loading.hide();
       this.modal.dismiss(true);

@@ -177,6 +177,14 @@ namespace Chaldea.Services.Nodes
             var videoInfos = await _nodeProxy.GetVideoInfos(nodeId, files);
             var anime = await _animeRepository.GetAsync(x => x.Id == input.AnimeId);
             if (anime.Videos == null) anime.Videos = new List<Resource>();
+            if (input.Clean)
+            {
+                var ids = anime.Videos.Select(x => x.Id).ToList();
+                var filter = Builders<Video>.Filter.In(x => x.Id, ids);
+                await _videoRepository.DeleteManyAsync(filter);
+                anime.Videos.Clear();
+            }
+
             var resources = new List<Resource>();
             var videos = input.PublishFiles.Zip(videoInfos, (fileInfo, videoInfo) =>
             {

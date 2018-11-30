@@ -21,17 +21,20 @@ namespace Chaldea.Services.Animes
         private readonly IRepository<string, Bangumi> _bangumiRepository;
         private readonly ILogger<AnimeService> _logger;
         private readonly IRepository<string, Video> _videoRepository;
+        private readonly IRepository<string, Favorite> _favoriteRepository;
 
         public AnimeService(
             ILogger<AnimeService> logger,
             IRepository<string, Anime> animeRepository,
             IRepository<string, Bangumi> bangumiRepository,
-            IRepository<string, Video> videoRepository)
+            IRepository<string, Video> videoRepository,
+            IRepository<string,Favorite> favoriteRepository)
         {
             _logger = logger;
             _animeRepository = animeRepository;
             _bangumiRepository = bangumiRepository;
             _videoRepository = videoRepository;
+            _favoriteRepository = favoriteRepository;
         }
 
         [AllowAnonymous]
@@ -92,7 +95,14 @@ namespace Chaldea.Services.Animes
             try
             {
                 var anime = await _animeRepository.GetAsync(x => x.Id == animeId);
-                return Mapper.Map<AnimeDto>(anime);
+                var output = Mapper.Map<AnimeDto>(anime);
+                if (IsLogin)
+                {
+                    var count = await _favoriteRepository.CountAsync(x => x.UserId == UserId && x.AnimeId == animeId);
+                    output.IsSubscribed = count > 0;
+                }
+
+                return output;
             }
             catch (Exception ex)
             {

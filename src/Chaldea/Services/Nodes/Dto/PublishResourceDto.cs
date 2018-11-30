@@ -14,6 +14,8 @@ namespace Chaldea.Services.Nodes.Dto
     {
         public string AnimeId { get; set; }
 
+        public bool Clean { get; set; }
+
         public ICollection<PublishDirFileInfo> PublishFiles { get; set; }
     }
 }

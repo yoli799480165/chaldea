@@ -38,7 +38,7 @@ export class AnimeDetailComponent extends ComponentBase implements OnInit {
   getAnime(): void {
     const animeId = this.activeRoute.snapshot.params['animeId'];
     this.animeServiceProxy.getAnime(animeId).subscribe((rep) => {
-      this.cover = `${AppConsts.appBaseUrl}/statics/imgs/${rep.cover}`;
+      this.cover = `${AppConsts.appBaseUrl}/statics/imgs/cover/${rep.cover}`;
       this.anime = rep;
     });
   }
