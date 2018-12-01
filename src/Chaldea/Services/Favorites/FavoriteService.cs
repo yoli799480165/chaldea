@@ -100,6 +100,7 @@ namespace Chaldea.Services.Favorites
                 var stages = new List<string>
                 {
                     "{$match: {'userId':'" + UserId + "'}}",
+                    "{$sort:{'creationTime':-1}}",
                     "{$lookup:{from:'historys',let:{fav_userId:'$userId',fav_animeId:'$animeId'},pipeline:[{$match:{$expr:{$and:[{$eq:['$userId','$$fav_userId']},{$eq:['$animeId','$$fav_animeId']}]}}}],as:'histories'}}",
                     "{$lookup:{from:'animes',localField:'animeId',foreignField:'_id',as:'anime'}}",
                     "{$unwind:'$anime'}",
@@ -109,10 +110,11 @@ namespace Chaldea.Services.Favorites
                 };
 
                 if (skip >= 0 && take > 0)
-                {
-                    stages.Add("{$skip:" + skip + "}");
-                    stages.Add("{$limit:" + take + "}");
-                }
+                    stages.InsertRange(1, new[]
+                    {
+                        "{$skip:" + skip + "}",
+                        "{$limit:" + take + "}"
+                    });
 
                 var pipeline = PipelineDefinition<Favorite, FavoriteDto>.Create(stages);
                 var favorites = await _favoriteRepository.Aggregate(pipeline).ToListAsync();

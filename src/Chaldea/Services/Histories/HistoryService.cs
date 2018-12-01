@@ -66,7 +66,7 @@ namespace Chaldea.Services.Histories
                 }
                 else
                 {
-                    var screenshotFile = $"{Guid.NewGuid():N}.jpg";
+                    var screenshotFile = $"{history.Id}.jpg";
                     System.IO.File.WriteAllBytes(Path.Combine(HistoryPath, screenshotFile),
                         GetDataFromBase64Image(input.Screenshot));
                     history.LastModificationTime = DateTime.UtcNow;

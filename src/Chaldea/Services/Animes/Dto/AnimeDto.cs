@@ -37,8 +37,6 @@ namespace Chaldea.Services.Animes.Dto
 
         public List<Resource> Novels { get; set; }
 
-        public List<string> Comments { get; set; }
-
         public bool IsSubscribed { get; set; }
     }
 }

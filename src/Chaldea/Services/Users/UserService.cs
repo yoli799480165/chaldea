@@ -48,6 +48,7 @@ namespace Chaldea.Services.Users
             if (input == null)
                 throw new UserFriendlyException($"Invalid parameter {nameof(input)}");
             var user = Mapper.Map<User>(input);
+            user.Avatar = "avatar.jpg";
             user.Id = Guid.NewGuid().ToString("N");
             user.Password = Md5Helper.Md5("123qwe");
             await _userRepository.AddAsync(user);

@@ -97,11 +97,6 @@ namespace Chaldea.Core.Repositories
         public List<Resource> Novels { get; set; }
 
         /// <summary>
-        ///     评论
-        /// </summary>
-        public List<string> Comments { get; set; }
-
-        /// <summary>
         ///     Id
         /// </summary>
         public string Id { get; set; }
@@ -220,7 +215,19 @@ namespace Chaldea.Core.Repositories
     /// </summary>
     public class Comment : IEntity<string>
     {
+        public DateTime CreationTime { get; set; }
+
+        public List<Comment> Replies { get; set; }
+
+        public List<string> Likes { get; set; }
+
+        public List<string> Unlikes { get; set; }
+
+        public int Index { get; set; }
+
         public string Content { get; set; }
+
+        public string TargetId { get; set; }
 
         public string UserId { get; set; }
 
@@ -395,6 +402,20 @@ namespace Chaldea.Core.Repositories
         public string AnimeId { get; set; }
 
         public string UserId { get; set; }
+
+        public string Id { get; set; }
+    }
+
+    /// <summary>
+    ///     反馈
+    /// </summary>
+    public class Feedback : IEntity<string>
+    {
+        public DateTime CreationTime { get; set; }
+
+        public string Contact { get; set; }
+
+        public string Advice { get; set; }
 
         public string Id { get; set; }
     }
