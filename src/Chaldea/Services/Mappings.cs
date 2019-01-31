@@ -27,6 +27,8 @@ namespace Chaldea.Services
                 cfg.CreateMap<FeedbackDto, Feedback>();
                 cfg.CreateMap<HistoryDto, History>();
                 cfg.CreateMap<UserDto, User>();
+                cfg.CreateMap<User, UserDetailDto>().ForMember(x => x.Favorites, opt => opt.Ignore())
+                    .ForMember(x => x.Achievements, opt => opt.Ignore());
                 cfg.CreateMap<Video, VideoDto>().ForMember(x => x.CurrentTime, opt => opt.Ignore());
                 cfg.CreateMap<ICollection<AnimeOutlineDto>, ICollection<Anime>>();
                 cfg.CreateMap<ICollection<BangumiDto>, ICollection<Bangumi>>();

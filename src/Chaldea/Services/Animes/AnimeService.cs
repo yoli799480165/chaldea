@@ -75,7 +75,7 @@ namespace Chaldea.Services.Animes
                     stages.Add("{$project:{animes:{$slice:['$animes'," + skip + "," + take + "]}}}");
                 var pipeline = PipelineDefinition<Bangumi, BangumiAnimesDto>.Create(stages);
                 var bangumi = await _bangumiRepository.Aggregate(pipeline).FirstOrDefaultAsync();
-                return bangumi.Animes;
+                return bangumi?.Animes;
             }
             catch (Exception ex)
             {

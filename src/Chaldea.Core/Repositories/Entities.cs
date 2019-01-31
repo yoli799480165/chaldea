@@ -317,6 +317,16 @@ namespace Chaldea.Core.Repositories
     /// </summary>
     public class User : IEntity<string>
     {
+        public DateTime? RegisterDate { get; set; }
+
+        public DateTime? BirthDate { get; set; }
+
+        public string Signature { get; set; }
+
+        public string Gender { get; set; }
+
+        public string NickName { get; set; }
+
         public string Role { get; set; }
 
         public bool IsActive { get; set; }

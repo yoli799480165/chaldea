@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Chaldea.Core.Nodes;
 using Chaldea.Node.Configuration;
 using Chaldea.Node.Utilities;
@@ -61,7 +62,7 @@ namespace Chaldea.Node.Services
                     Length = x.Length,
                     FullName = x.FullName,
                     Type = DirFileType.File
-                }).ToList();
+                }).OrderBy(x => x.Name).ToList();
                 list.AddRange(files);
                 return list;
             }
@@ -109,28 +110,38 @@ namespace Chaldea.Node.Services
                 return sb.ToString();
             }
 
-            foreach (var dirFile in extractFileInfo.Files)
-                try
-                {
-                    if (dirFile.Type == DirFileType.File)
+            Task.Run(() =>
+            {
+                var start = DateTime.Now;
+                Console.WriteLine($"开始解压文件 {start:yyyy-MM-dd HH:mm:ss}");
+                foreach (var dirFile in extractFileInfo.Files)
+                    try
                     {
-                        if (!File.Exists(dirFile.FullName))
-                            sb.AppendLine($"File {dirFile.Name} not exist, skipped.");
+                        if (dirFile.Type == DirFileType.File)
+                        {
+                            if (!File.Exists(dirFile.FullName))
+                                sb.AppendLine($"File {dirFile.Name} not exist, skipped.");
+                            else
+                            {
+                                Console.WriteLine($"正在解压：{dirFile.FullName}");
+                                Compress.Extract(dirFile.FullName, extractFileInfo.DestDir,
+                                    new ReaderOptions { Password = extractFileInfo.Password });
+                            }
+                        }
                         else
-                            Compress.Extract(dirFile.FullName, extractFileInfo.DestDir,
-                                new ReaderOptions {Password = extractFileInfo.Password});
+                        {
+                            sb.AppendLine($"{dirFile.Name} is not file, skipped.");
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        sb.AppendLine($"{dirFile.Name} is not file, skipped.");
+                        _logger.LogError(ex.ToString());
+                        sb.AppendLine(ex.Message);
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    sb.AppendLine(ex.Message);
-                }
 
+                var end = DateTime.Now;
+                Console.WriteLine($"解压结束，共计文件 {extractFileInfo.Files.Count}个，耗时 {(end - start).TotalMinutes}分");
+            });
             return sb.ToString();
         }
 

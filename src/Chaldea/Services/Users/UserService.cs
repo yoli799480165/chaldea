@@ -9,6 +9,7 @@ using Chaldea.Services.Dtos;
 using Chaldea.Services.Users.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
 namespace Chaldea.Services.Users
@@ -17,12 +18,18 @@ namespace Chaldea.Services.Users
     [Route("api/user")]
     public class UserService : ServiceBase
     {
+        private readonly IRepository<string, Favorite> _favoriteRepository;
+        private readonly ILogger<UserService> _logger;
         private readonly IRepository<string, User> _userRepository;
 
         public UserService(
-            IRepository<string, User> userRepository)
+            ILogger<UserService> logger,
+            IRepository<string, User> userRepository,
+            IRepository<string, Favorite> favoriteRepository)
         {
+            _logger = logger;
             _userRepository = userRepository;
+            _favoriteRepository = favoriteRepository;
         }
 
         [Authorize(Roles = nameof(UserRoles.Admin))]
@@ -78,6 +85,25 @@ namespace Chaldea.Services.Users
                     Value = item.ToString()
                 });
             return weeks;
+        }
+
+        [Authorize]
+        [Route("getUserDetail")]
+        [HttpGet]
+        public async Task<UserDetailDto> GetUserDetail()
+        {
+            try
+            {
+                var user = await _userRepository.GetAsync(x => x.Id == UserId);
+                var userDetail = Mapper.Map<UserDetailDto>(user);
+                userDetail.Favorites = await _favoriteRepository.CountAsync(x => x.UserId == UserId);
+                return userDetail;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw new UserFriendlyException("Get user detail failed.");
+            }
         }
     }
 }

@@ -72,7 +72,7 @@ namespace Chaldea.Services.Comments
                     "{$sort:{'creationTime':-1}}",
                     "{$lookup:{from:'users',localField:'userId',foreignField:'_id',as:'user'}}",
                     "{$unwind:'$user'}",
-                    "{$project:{'_id':1,'userId':1,'userName':'$user.name','avatar':'$user.avatar','content':1,'index':1,'likes':1,'unlikes':1,'replies':1,'creationTime':1}}"
+                    "{$project:{'_id':1,'userId':1,'userName':'$user.nickName','avatar':'$user.avatar','content':1,'index':1,'likes':1,'unlikes':1,'replies':1,'creationTime':1}}"
                 };
 
                 if (skip >= 0 && take > 0)

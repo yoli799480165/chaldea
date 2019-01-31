@@ -38,6 +38,7 @@ export class AnimeDetailComponent extends ComponentBase implements OnInit {
   getAnime(): void {
     const animeId = this.activeRoute.snapshot.params['animeId'];
     this.animeServiceProxy.getAnime(animeId).subscribe((rep) => {
+      rep.desc = this.escape(rep.desc);
       this.cover = `${AppConsts.appBaseUrl}/statics/imgs/cover/${rep.cover}`;
       this.anime = rep;
     });
@@ -73,5 +74,25 @@ export class AnimeDetailComponent extends ComponentBase implements OnInit {
         });
       }
     });
+  }
+
+  escape(value) {
+    if (value) {
+      return value
+        .replace(new RegExp('&ldquo;', 'g'), '“')
+        .replace(new RegExp('&rdquo;', 'g'), '”')
+        .replace(new RegExp('&mdash;', 'g'), '—')
+        .replace(new RegExp('&hellip;', 'g'), '…')
+        .replace(new RegExp('&middot;', 'g'), '·')
+        .replace(new RegExp('&times;', 'g'), '×')
+        .replace(new RegExp('&quot;', 'g'), '"')
+        .replace(new RegExp('&amp;', 'g'), '&')
+        .replace(new RegExp('&lsquo;', 'g'), '‘')
+        .replace(new RegExp('&rsquo;', 'g'), '’')
+        .replace(new RegExp('&nbsp;', 'g'), ' ')
+        .replace(new RegExp('&#39;', 'g'), '\'')
+        .replace(new RegExp('收缩全文', 'g'), '');
+    }
+    return value;
   }
 }

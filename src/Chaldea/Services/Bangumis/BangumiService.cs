@@ -96,7 +96,8 @@ namespace Chaldea.Services.Bangumis
             try
             {
                 var query = Builders<Bangumi>.Projection.Include(x => x.Id).Include(x => x.Name);
-                var list = await _bangumiRepository.GetAll().Project<Bangumi>(query).ToListAsync();
+                var sort = Builders<Bangumi>.Sort.Descending(x => x.Name);
+                var list = await _bangumiRepository.GetAll().Project<Bangumi>(query).Sort(sort).ToListAsync();
                 return Mapper.Map<List<BangumiDto>>(list);
             }
             catch (Exception ex)
@@ -160,7 +161,7 @@ namespace Chaldea.Services.Bangumis
 
             _logger.LogInformation($"Begin to import, begin date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
-            var imgPath = Path.Combine(Directory.GetCurrentDirectory(), "statics", "imgs");
+            var imgPath = Path.Combine(Directory.GetCurrentDirectory(), "statics", "imgs", "cover");
             if (!Directory.Exists(imgPath))
                 Directory.CreateDirectory(imgPath);
 
@@ -213,6 +214,10 @@ namespace Chaldea.Services.Bangumis
 
                     var downloadUrl = imgUrl.Substring(0, 4).ToLower() == "http" ? imgUrl : $"{baseUrl}{imgUrl}";
                     var imgName = Path.GetFileName(imgUrl);
+                    if (imgName.Contains("?"))
+                    {
+                        imgName = imgName.Substring(0, imgName.IndexOf("?", StringComparison.Ordinal));
+                    }
                     var savePath = Path.Combine(imgPath, imgName);
                     if (!System.IO.File.Exists(savePath))
                         webClient.DownloadFile(downloadUrl, savePath);

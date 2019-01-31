@@ -16,6 +16,7 @@ export class ExtractFileComponent extends ComponentBase implements OnInit {
         private nodeServiceProxy: NodeServiceProxy
     ) {
         super(injector);
+        this.extractFileDto.password = 'www.yxdm.tv';
     }
 
     ngOnInit() {
