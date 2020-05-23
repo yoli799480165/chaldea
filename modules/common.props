@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <SdkVersion>3.1.0</SdkVersion>
+    <AbpVersion>2.8.0</AbpVersion>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+</Project>

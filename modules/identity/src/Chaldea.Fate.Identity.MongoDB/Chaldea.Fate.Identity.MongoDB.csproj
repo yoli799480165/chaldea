@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\..\common.props" />
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.MongoDB" Version="2.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Chaldea.Fate.Identity.Domain\Chaldea.Fate.Identity.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
